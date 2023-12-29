@@ -1,6 +1,7 @@
 #!/bin/bash
 set -e
 
+echo "begin to build"
 source $(dirname $0)/version
 
 cd $(dirname $0)/..
@@ -10,13 +11,16 @@ if [ "$(uname)" = "Linux" ]; then
     OTHER_LINKFLAGS="-extldflags -static -s"
 fi
 
+echo "print env value $ENV_VALUE"
+
 if [ "$OAUTH_TOKEN" != "" ]; then
+  echo "config token"
    git config --global url."https://${OAUTH_TOKEN}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
 fi
 
 LINKFLAGS="-X main.Version=$VERSION"
 LINKFLAGS="-X main.GitCommit=$COMMIT $LINKFLAGS"
-CGO_ENABLED=0 go build -ldflags "$LINKFLAGS $OTHER_LINKFLAGS" -o bin/webhook
+CGO_ENABLED=0 GOPRIVATE="github.com/cnrancher" go build -ldflags "$LINKFLAGS $OTHER_LINKFLAGS" -o bin/webhook
 if [ "$CROSS" = "true" ] && [ "$ARCH" = "amd64" ]; then
     GOOS=darwin GOPRIVATE="github.com/cnrancher" go build -ldflags "$LINKFLAGS" -o bin/webhook-darwin
     GOOS=windows GOPRIVATE="github.com/cnrancher" go build -ldflags "$LINKFLAGS" -o bin/webhook-windows

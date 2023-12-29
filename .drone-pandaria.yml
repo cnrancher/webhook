@@ -13,6 +13,8 @@ steps:
     environment:
       OAUTH_TOKEN:
         from_secret: github_token
+      ENV_VALUE:
+        from_secret: jacie_test
     commands:
       - dapper ci
     volumes:
