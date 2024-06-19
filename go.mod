@@ -4,7 +4,7 @@ go 1.21
 
 replace (
 	github.com/rancher/aks-operator => github.com/cnrancher/aks-operator v1.1.0-ent-rc6
-	github.com/rancher/rancher/pkg/apis => github.com/cnrancher/pandaria/pkg/apis v0.0.0-20240516064412-6270e8993be5
+	github.com/rancher/rancher/pkg/apis => github.com/cnrancher/pandaria/pkg/apis v0.0.0-20240618045058-daa20f778707
 	k8s.io/api => k8s.io/api v0.28.6
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.28.6
 	k8s.io/apimachinery => k8s.io/apimachinery v0.28.6
@@ -40,14 +40,15 @@ require (
 	github.com/gorilla/mux v1.8.0
 	github.com/rancher/dynamiclistener v0.4.0-rc2
 	github.com/rancher/lasso v0.0.0-20240123150939-7055397d6dfa
-	github.com/rancher/rancher/pkg/apis v0.0.0-20240507213626-07f244b8be3a
-	github.com/rancher/rke v1.5.9
+	github.com/rancher/rancher/pkg/apis v0.0.0-20240611181232-2ac6cd2b15f6
+	github.com/rancher/rke v1.5.10
 	github.com/rancher/wrangler/v2 v2.1.4
+	github.com/robfig/cron v1.2.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.8.4
 	golang.org/x/exp v0.0.0-20230905200255-921286631fa9
 	golang.org/x/text v0.14.0
-	golang.org/x/tools v0.16.1
+	golang.org/x/tools v0.18.0
 	k8s.io/api v0.28.6
 	k8s.io/apimachinery v0.28.6
 	k8s.io/apiserver v0.28.6
@@ -135,10 +136,10 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.24.0 // indirect
 	golang.org/x/crypto v0.19.0 // indirect
-	golang.org/x/mod v0.14.0 // indirect
+	golang.org/x/mod v0.15.0 // indirect
 	golang.org/x/net v0.21.0 // indirect
 	golang.org/x/oauth2 v0.16.0 // indirect
-	golang.org/x/sync v0.5.0 // indirect
+	golang.org/x/sync v0.6.0 // indirect
 	golang.org/x/sys v0.17.0 // indirect
 	golang.org/x/term v0.17.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
