@@ -60,7 +60,9 @@ Only 1 clusterproxyconfig per downstream cluster is ever permitted.
 
 #### Escalation Prevention
 
-Users can only create/update ClusterRoleTemplateBindings which grant permissions to RoleTemplates with rights less than or equal to those they currently possess. This is to prevent privilege escalation. 
+Users can only create/update ClusterRoleTemplateBindings which grant permissions to RoleTemplates with rights less than or equal to those they currently possess. This is to prevent privilege escalation.
+For external RoleTemplates (RoleTemplates with `external` set to `true`), if the `external-rules` feature flag is enabled and `ExternalRules` is specified in the roleTemplate in `RoleTemplateName`,
+`ExternalRules` will be used for authorization. Otherwise (if the feature flag is off or `ExternalRules` are nil), the rules from the backing `ClusterRole` in the local cluster will be used.
 
 #### Invalid Fields - Create
 
@@ -99,6 +101,7 @@ In addition, as in the create validation, both a user subject and a group subjec
 #### On update
 
 The desired value must not change on new spec unless it's equal to the `lockedValue` or `lockedValue` is nil.
+Due to the security impact of the `external-rules` feature flag, only users with admin permissions (`*` verbs on `*` resources in `*` APIGroups in all namespaces) can enable or disable this feature flag.
 
 ## FleetWorkspace 
 
@@ -135,7 +138,7 @@ Rules without verbs, resources, or apigroups are not permitted. The `rules` incl
 
  Escalation checks are bypassed if a user has the `escalate` verb on the GlobalRole that they are attempting to update or create. This can also be given through a wildcard permission (i.e. the `*` verb also gives `escalate`).
 
-Users can only change GlobalRoles with rights less than or equal to those they currently possess. This is to prevent privilege escalation. This includes the rules in the RoleTemplates referred to in `inheritedClusterRoles`.
+Users can only change GlobalRoles with rights less than or equal to those they currently possess. This is to prevent privilege escalation. This includes the rules in the RoleTemplates referred to in `inheritedClusterRoles` and the rules in `inheritedFleetWorkspacePermissions`.
 
 Users can only grant rules in the `NamespacedRules` field with rights less than or equal to those they currently possess. This works on a per namespace basis, meaning that the user must have the permission
 in the namespace specified. The `Rules` field apply to every namespace, which means a user can create `NamespacedRules` in any namespace that are equal to or less than the `Rules` they currently possess.
@@ -226,6 +229,8 @@ Adds the authz.management.cattle.io/creator-role-bindings annotation.
 
 Users can only create/update ProjectRoleTemplateBindings with rights less than or equal to those they currently possess.
 This is to prevent privilege escalation.
+For external RoleTemplates (RoleTemplates with `external` set to `true`), if the `external-rules` feature flag is enabled and `ExternalRules` is specified in the roleTemplate in `RoleTemplateName`,
+`ExternalRules` will be used for authorization. Otherwise, if `ExternalRules` are nil when the feature flag is on, the rules from the backing `ClusterRole` in the local cluster will be used.
 
 #### Invalid Fields - Create
 
@@ -275,11 +280,12 @@ Circular references to a `RoleTemplate` (a inherits b, b inherits a) are not all
 
 #### Rules Without Verbs, Resources, API groups
 
-Rules without verbs, resources, or apigroups are not permitted. The `rules` included in a RoleTemplate are of the same type as the rules used by standard Kubernetes RBAC types (such as `Roles` from `rbac.authorization.k8s.io/v1`). Because of this, they inherit the same restrictions as these types, including this one.
+Rules without verbs, resources, or apigroups are not permitted. The `rules` and `externalRules` included in a RoleTemplate are of the same type as the rules used by standard Kubernetes RBAC types (such as `Roles` from `rbac.authorization.k8s.io/v1`). Because of this, they inherit the same restrictions as these types, including this one.
 
 #### Escalation Prevention
 
 Users can only change RoleTemplates with rights less than or equal to those they currently possess. This prevents privilege escalation. 
+Users can't create external RoleTemplates (or update existing RoleTemplates) with `ExternalRules` without having the `escalate` verb on that RoleTemplate.
 
 #### Context Validation
 
@@ -301,7 +307,65 @@ If `roletemplates.builtin` is true then all fields are immutable except:
 
 RoleTemplate can not be deleted if they are referenced by other RoleTemplates via `roletemplates.roleTemplateNames` or by GlobalRoles via `globalRoles.inheritedClusterRoles`
 
+## Setting 
+
+### Validation Checks
+
+#### Invalid Fields - Create
+
+When a Setting is created, the following checks take place:
+
+- If set, `disable-inactive-user-after` must be zero or a positive duration (e.g. `240h`).
+- If set, `delete-inactive-user-after` must be zero or a positive duration (e.g. `240h`).
+- If set, `user-last-login-default` must be a date time according to RFC3339 (e.g. `2023-11-29T00:00:00Z`).
+- If set, `user-retention-cron` must be a valid standard cron expression (e.g. `0 0 * * 0`).
+
+#### Invalid Fields - Update
+
+When a Setting is updated, the following checks take place:
+
+- If set, `disable-inactive-user-after` must be zero or a positive duration (e.g. `240h`).
+- If set, `delete-inactive-user-after` must be zero or a positive duration (e.g. `240h`).
+- If set, `user-last-login-default` must be a date time according to RFC3339 (e.g. `2023-11-29T00:00:00Z`).
+- If set, `user-retention-cron` must be a valid standard cron expression (e.g. `0 0 * * 1`).
+
+## UserAttribute 
+
+### Validation Checks
+
+#### Invalid Fields - Create
+
+When a UserAttribute is created, the following checks take place:
+
+- If set, `lastLogin` must be a valid date time according to RFC3339 (e.g. `2023-11-29T00:00:00Z`).
+- If set, `disableAfter` must be zero or a positive duration (e.g. `240h`).
+- If set, `deleteAfter` must be zero or a positive duration (e.g. `240h`).
+
+#### Invalid Fields - Update
+
+When a UserAttribute is updated, the following checks take place:
+
+- If set, `lastLogin` must be a valid date time according to RFC3339 (e.g. `2023-11-29T00:00:00Z`).
+- If set, `disableAfter` must be zero or a positive duration (e.g. `240h`).
+- If set, `deleteAfter` must be zero or a positive duration (e.g. `240h`).
+
 # rbac.authorization.k8s.io/v1 
+
+## ClusterRole 
+
+### Validation Checks
+
+#### Invalid Fields - Update
+Users cannot update or remove the following label after it has been added:
+- authz.management.cattle.io/gr-owner
+
+## ClusterRoleBinding 
+
+### Validation Checks
+
+#### Invalid Fields - Update
+Users cannot update or remove the following label after it has been added:
+- authz.management.cattle.io/grb-owner
 
 ## Role 
 

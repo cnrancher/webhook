@@ -58,12 +58,16 @@ func (r *RoleTemplateResolver) RulesFromTemplate(roleTemplate *rancherv3.RoleTem
 func (r *RoleTemplateResolver) gatherRules(roleTemplate *rancherv3.RoleTemplate, rules []rbacv1.PolicyRule, seen map[string]bool) ([]rbacv1.PolicyRule, error) {
 	seen[roleTemplate.Name] = true
 
-	if roleTemplate.External && roleTemplate.Context == "cluster" {
-		cr, err := r.clusterRoles.Get(roleTemplate.Name)
-		if err != nil {
-			return nil, fmt.Errorf("failed to get clusterRoles '%s': %w", roleTemplate.Name, err)
+	if roleTemplate.External {
+		if roleTemplate.ExternalRules != nil {
+			rules = append(rules, roleTemplate.ExternalRules...)
+		} else {
+			cr, err := r.clusterRoles.Get(roleTemplate.Name)
+			if err != nil {
+				return nil, fmt.Errorf("for external RoleTemplates, externalRules must be provided or a backing clusterRole must be installed to check for privilege escalations: failed to get ClusterRole %q: %w", roleTemplate.Name, err)
+			}
+			rules = append(rules, cr.Rules...)
 		}
-		rules = append(rules, cr.Rules...)
 	}
 
 	rules = append(rules, roleTemplate.Rules...)

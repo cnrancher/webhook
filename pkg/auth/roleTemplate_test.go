@@ -54,14 +54,18 @@ func (r Rules) Equal(r2 Rules) bool {
 
 type RoleTemplateResolverSuite struct {
 	suite.Suite
-	adminRT           *apisv3.RoleTemplate
-	readNodesRT       *apisv3.RoleTemplate
-	writeNodesRT      *apisv3.RoleTemplate
-	inheritedRT       *apisv3.RoleTemplate
-	externalRT        *apisv3.RoleTemplate
-	invalidInhertedRT *apisv3.RoleTemplate
+	adminRT                *apisv3.RoleTemplate
+	readNodesRT            *apisv3.RoleTemplate
+	writeNodesRT           *apisv3.RoleTemplate
+	inheritedRT            *apisv3.RoleTemplate
+	externalRulesClusterRT *apisv3.RoleTemplate
+	externalRulesProjectRT *apisv3.RoleTemplate
+	externalClusterRT      *apisv3.RoleTemplate
+	externalProjectRT      *apisv3.RoleTemplate
+	invalidInhertedRT      *apisv3.RoleTemplate
 
 	readServiceCR *rbacv1.ClusterRole
+	writeNodesCR  *rbacv1.ClusterRole
 }
 
 func TestRoleTemplateResolver(t *testing.T) {
@@ -93,6 +97,10 @@ func (r *RoleTemplateResolverSuite) SetupSuite() {
 		ObjectMeta: metav1.ObjectMeta{Name: "read-services"},
 		Rules:      []rbacv1.PolicyRule{ruleReadServices},
 	}
+	r.writeNodesCR = &rbacv1.ClusterRole{
+		ObjectMeta: metav1.ObjectMeta{Name: "write-nodes"},
+		Rules:      []rbacv1.PolicyRule{ruleWriteNodes},
+	}
 
 	r.readNodesRT = &apisv3.RoleTemplate{
 		ObjectMeta: metav1.ObjectMeta{
@@ -121,7 +129,25 @@ func (r *RoleTemplateResolverSuite) SetupSuite() {
 		Administrative: true,
 		Context:        "cluster",
 	}
-	r.externalRT = &apisv3.RoleTemplate{
+	r.externalRulesClusterRT = &apisv3.RoleTemplate{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: r.readServiceCR.Name,
+		},
+		DisplayName:   "External Role",
+		Context:       "cluster",
+		External:      true,
+		ExternalRules: []rbacv1.PolicyRule{ruleWriteNodes},
+	}
+	r.externalRulesProjectRT = &apisv3.RoleTemplate{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: r.readServiceCR.Name,
+		},
+		DisplayName:   "External Role",
+		Context:       "project",
+		External:      true,
+		ExternalRules: []rbacv1.PolicyRule{ruleWriteNodes},
+	}
+	r.externalClusterRT = &apisv3.RoleTemplate{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: r.readServiceCR.Name,
 		},
@@ -129,7 +155,14 @@ func (r *RoleTemplateResolverSuite) SetupSuite() {
 		Context:     "cluster",
 		External:    true,
 	}
-
+	r.externalProjectRT = &apisv3.RoleTemplate{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: r.readServiceCR.Name,
+		},
+		DisplayName: "External Role",
+		Context:     "project",
+		External:    true,
+	}
 	r.inheritedRT = &apisv3.RoleTemplate{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: "inherited-role",
@@ -170,6 +203,7 @@ func (r *RoleTemplateResolverSuite) TestRoleTemplateResolver() {
 					roleTemplateCache := fake.NewMockNonNamespacedCacheInterface[*apisv3.RoleTemplate](ctrl)
 					roleTemplateCache.EXPECT().Get(r.adminRT.Name).Return(r.adminRT, nil).AnyTimes()
 					clusterRoleCache := fake.NewMockNonNamespacedCacheInterface[*rbacv1.ClusterRole](ctrl)
+
 					return roleTemplateCache, clusterRoleCache
 				},
 				name: r.adminRT.Name,
@@ -188,6 +222,7 @@ func (r *RoleTemplateResolverSuite) TestRoleTemplateResolver() {
 					roleTemplateCache.EXPECT().Get(r.readNodesRT.Name).Return(r.readNodesRT, nil)
 					roleTemplateCache.EXPECT().Get(r.writeNodesRT.Name).Return(r.writeNodesRT, nil)
 					clusterRoleCache := fake.NewMockNonNamespacedCacheInterface[*rbacv1.ClusterRole](ctrl)
+
 					return roleTemplateCache, clusterRoleCache
 				},
 				name: r.inheritedRT.Name,
@@ -195,22 +230,101 @@ func (r *RoleTemplateResolverSuite) TestRoleTemplateResolver() {
 			want:    append(r.inheritedRT.Rules, append(r.readNodesRT.Rules, r.writeNodesRT.Rules...)...),
 			wantErr: false,
 		},
-		// Get external role
 		{
-			name: "Test external cluster role",
+			name: "Test externalRules (context=cluster) ",
 			args: args{
 				caches: func() (v3.RoleTemplateCache, wranglerv1.ClusterRoleCache) {
 					ctrl := gomock.NewController(r.T())
 					roleTemplateCache := fake.NewMockNonNamespacedCacheInterface[*apisv3.RoleTemplate](ctrl)
-					roleTemplateCache.EXPECT().Get(r.externalRT.Name).Return(r.externalRT, nil)
+					roleTemplateCache.EXPECT().Get(r.externalRulesClusterRT.Name).Return(r.externalRulesClusterRT, nil)
 					clusterRoleCache := fake.NewMockNonNamespacedCacheInterface[*rbacv1.ClusterRole](ctrl)
-					clusterRoleCache.EXPECT().Get(r.readServiceCR.Name).Return(r.readServiceCR, nil)
 					return roleTemplateCache, clusterRoleCache
 				},
-				name: r.externalRT.Name,
+				name: r.externalRulesClusterRT.Name,
+			},
+			want:    r.writeNodesCR.Rules,
+			wantErr: false,
+		},
+		{
+			name: "Test externalRules (context=project)",
+			args: args{
+				caches: func() (v3.RoleTemplateCache, wranglerv1.ClusterRoleCache) {
+					ctrl := gomock.NewController(r.T())
+					roleTemplateCache := fake.NewMockNonNamespacedCacheInterface[*apisv3.RoleTemplate](ctrl)
+					roleTemplateCache.EXPECT().Get(r.externalRulesProjectRT.Name).Return(r.externalRulesProjectRT, nil)
+					clusterRoleCache := fake.NewMockNonNamespacedCacheInterface[*rbacv1.ClusterRole](ctrl)
+					return roleTemplateCache, clusterRoleCache
+				},
+				name: r.externalRulesProjectRT.Name,
+			},
+			want:    r.writeNodesCR.Rules,
+			wantErr: false,
+		},
+		{
+			name: "Test external cluster role (context=cluster)",
+			args: args{
+				caches: func() (v3.RoleTemplateCache, wranglerv1.ClusterRoleCache) {
+					ctrl := gomock.NewController(r.T())
+					roleTemplateCache := fake.NewMockNonNamespacedCacheInterface[*apisv3.RoleTemplate](ctrl)
+					roleTemplateCache.EXPECT().Get(r.externalClusterRT.Name).Return(r.externalClusterRT, nil)
+					clusterRoleCache := fake.NewMockNonNamespacedCacheInterface[*rbacv1.ClusterRole](ctrl)
+					clusterRoleCache.EXPECT().Get(r.readServiceCR.Name).Return(r.readServiceCR, nil)
+
+					return roleTemplateCache, clusterRoleCache
+				},
+				name: r.externalClusterRT.Name,
 			},
 			want:    r.readServiceCR.Rules,
 			wantErr: false,
+		},
+		{
+			name: "Test external cluster role (context=project)",
+			args: args{
+				caches: func() (v3.RoleTemplateCache, wranglerv1.ClusterRoleCache) {
+					ctrl := gomock.NewController(r.T())
+					roleTemplateCache := fake.NewMockNonNamespacedCacheInterface[*apisv3.RoleTemplate](ctrl)
+					roleTemplateCache.EXPECT().Get(r.externalProjectRT.Name).Return(r.externalProjectRT, nil)
+					clusterRoleCache := fake.NewMockNonNamespacedCacheInterface[*rbacv1.ClusterRole](ctrl)
+					clusterRoleCache.EXPECT().Get(r.readServiceCR.Name).Return(r.readServiceCR, nil)
+
+					return roleTemplateCache, clusterRoleCache
+				},
+				name: r.externalProjectRT.Name,
+			},
+			want:    r.readServiceCR.Rules,
+			wantErr: false,
+		},
+		{
+			name: "Test non-existing external cluster role (context=cluster)",
+			args: args{
+				caches: func() (v3.RoleTemplateCache, wranglerv1.ClusterRoleCache) {
+					ctrl := gomock.NewController(r.T())
+					roleTemplateCache := fake.NewMockNonNamespacedCacheInterface[*apisv3.RoleTemplate](ctrl)
+					roleTemplateCache.EXPECT().Get(r.externalClusterRT.Name).Return(r.externalClusterRT, nil)
+					clusterRoleCache := fake.NewMockNonNamespacedCacheInterface[*rbacv1.ClusterRole](ctrl)
+					clusterRoleCache.EXPECT().Get(r.readServiceCR.Name).Return(nil, errExpected)
+
+					return roleTemplateCache, clusterRoleCache
+				},
+				name: r.externalClusterRT.Name,
+			},
+			wantErr: true,
+		},
+		{
+			name: "Test non-existing external cluster role (context=project)",
+			args: args{
+				caches: func() (v3.RoleTemplateCache, wranglerv1.ClusterRoleCache) {
+					ctrl := gomock.NewController(r.T())
+					roleTemplateCache := fake.NewMockNonNamespacedCacheInterface[*apisv3.RoleTemplate](ctrl)
+					roleTemplateCache.EXPECT().Get(r.externalProjectRT.Name).Return(r.externalProjectRT, nil)
+					clusterRoleCache := fake.NewMockNonNamespacedCacheInterface[*rbacv1.ClusterRole](ctrl)
+					clusterRoleCache.EXPECT().Get(r.readServiceCR.Name).Return(nil, errExpected)
+
+					return roleTemplateCache, clusterRoleCache
+				},
+				name: r.externalProjectRT.Name,
+			},
+			wantErr: true,
 		},
 		// Get unknown role
 		{
@@ -221,6 +335,7 @@ func (r *RoleTemplateResolverSuite) TestRoleTemplateResolver() {
 					roleTemplateCache := fake.NewMockNonNamespacedCacheInterface[*apisv3.RoleTemplate](ctrl)
 					roleTemplateCache.EXPECT().Get(invalidName).Return(nil, errExpected)
 					clusterRoleCache := fake.NewMockNonNamespacedCacheInterface[*rbacv1.ClusterRole](ctrl)
+
 					return roleTemplateCache, clusterRoleCache
 				},
 				name: invalidName,
@@ -238,6 +353,7 @@ func (r *RoleTemplateResolverSuite) TestRoleTemplateResolver() {
 					roleTemplateCache.EXPECT().Get(r.invalidInhertedRT.Name).Return(r.invalidInhertedRT, nil)
 					roleTemplateCache.EXPECT().Get(invalidName).Return(nil, errExpected)
 					clusterRoleCache := fake.NewMockNonNamespacedCacheInterface[*rbacv1.ClusterRole](ctrl)
+
 					return roleTemplateCache, clusterRoleCache
 				},
 				name: r.invalidInhertedRT.Name,

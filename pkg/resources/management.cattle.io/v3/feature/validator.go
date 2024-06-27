@@ -11,6 +11,7 @@ import (
 	admissionregistrationv1 "k8s.io/api/admissionregistration/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/kubernetes/pkg/registry/rbac/validation"
 	"k8s.io/utils/trace"
 )
 
@@ -54,7 +55,9 @@ func (v *Validator) Admitters() []admission.Admitter {
 	return []admission.Admitter{&v.admitter}
 }
 
-type admitter struct{}
+type admitter struct {
+	ruleResolver validation.AuthorizationRuleResolver
+}
 
 // Admit handles the webhook admission request sent to this webhook.
 func (a *admitter) Admit(request *admission.Request) (*admissionv1.AdmissionResponse, error) {

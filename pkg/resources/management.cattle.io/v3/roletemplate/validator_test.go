@@ -54,15 +54,13 @@ func (r *RoleTemplateSuite) Test_PrivilegeEscalation() {
 	ctrl := gomock.NewController(r.T())
 
 	roleTemplateCache := fake.NewMockNonNamespacedCacheInterface[*v3.RoleTemplate](ctrl)
-	roleTemplateCache.EXPECT().AddIndexer(expectedIndexerName, gomock.Any())
+	roleTemplateCache.EXPECT().AddIndexer(expectedIndexerName, gomock.Any()).AnyTimes()
 	roleTemplateCache.EXPECT().Get(r.adminRT.Name).Return(r.adminRT, nil).AnyTimes()
 	roleTemplateCache.EXPECT().Get(r.readNodesRT.Name).Return(r.readNodesRT, nil).AnyTimes()
 	roleTemplateCache.EXPECT().Get(notFoundRoleTemplateName).Return(nil, newNotFound(notFoundRoleTemplateName)).AnyTimes()
 	roleTemplateCache.EXPECT().List(gomock.Any()).Return([]*v3.RoleTemplate{r.adminRT, r.readNodesRT}, nil).AnyTimes()
-	clusterRoleCache := fake.NewMockNonNamespacedCacheInterface[*rbacv1.ClusterRole](ctrl)
-	roleResolver := auth.NewRoleTemplateResolver(roleTemplateCache, clusterRoleCache)
 	grCache := fake.NewMockNonNamespacedCacheInterface[*v3.GlobalRole](ctrl)
-	grCache.EXPECT().AddIndexer(expectedGlobalRefIndex, gomock.Any())
+	grCache.EXPECT().AddIndexer(expectedGlobalRefIndex, gomock.Any()).AnyTimes()
 
 	k8Fake := &k8testing.Fake{}
 	fakeSAR := &k8fake.FakeSubjectAccessReviews{Fake: &k8fake.FakeAuthorizationV1{Fake: k8Fake}}
@@ -78,9 +76,6 @@ func (r *RoleTemplateSuite) Test_PrivilegeEscalation() {
 			spec.ResourceAttributes.Verb == "escalate"
 		return true, review, nil
 	})
-	validator := roletemplate.NewValidator(resolver, roleResolver, fakeSAR, grCache)
-	admitters := validator.Admitters()
-	r.Len(admitters, 1, "wanted only one admitter")
 
 	tests := []tableTest{
 		{
@@ -153,12 +148,96 @@ func (r *RoleTemplateSuite) Test_PrivilegeEscalation() {
 			},
 			allowed: false,
 		},
+		{
+			name: "user with escalate permissions can create external RoleTemplates with externalRules",
+			args: args{
+				username: testUser,
+				oldRT: func() *v3.RoleTemplate {
+					return nil
+				},
+				newRT: func() *v3.RoleTemplate {
+					baseRT := newDefaultRT()
+					baseRT.External = true
+					baseRT.ExternalRules = r.manageNodeRole.Rules
+
+					return baseRT
+				},
+			},
+			allowed: true,
+		},
+		{
+			name: "user without escalate permissions can't create external RoleTemplates with externalRules",
+			args: args{
+				username: noPrivUser,
+				oldRT: func() *v3.RoleTemplate {
+					return nil
+				},
+				newRT: func() *v3.RoleTemplate {
+					baseRT := newDefaultRT()
+					baseRT.External = true
+					baseRT.ExternalRules = r.manageNodeRole.Rules
+
+					return baseRT
+				},
+			},
+			allowed: false,
+		},
+		{
+			name: "user without escalate permissions can't update external RoleTemplates with externalRules",
+			args: args{
+				username: noPrivUser,
+				oldRT: func() *v3.RoleTemplate {
+					baseRT := newDefaultRT()
+
+					return baseRT
+				},
+				newRT: func() *v3.RoleTemplate {
+					baseRT := newDefaultRT()
+					baseRT.External = true
+					baseRT.ExternalRules = r.manageNodeRole.Rules
+
+					return baseRT
+				},
+			},
+			allowed: false,
+		},
+		{
+			name: "user with escalate permissions ca update external RoleTemplates with externalRules",
+			args: args{
+				username: testUser,
+				oldRT: func() *v3.RoleTemplate {
+					baseRT := newDefaultRT()
+
+					return baseRT
+				},
+				newRT: func() *v3.RoleTemplate {
+					baseRT := newDefaultRT()
+					baseRT.External = true
+					baseRT.ExternalRules = r.manageNodeRole.Rules
+
+					return baseRT
+				},
+			},
+			allowed: true,
+		},
 	}
 
 	for i := range tests {
 		test := tests[i]
 		r.Run(test.name, func() {
 			r.T().Parallel()
+			clusterRoleCache := fake.NewMockNonNamespacedCacheInterface[*rbacv1.ClusterRole](ctrl)
+
+			state := testState{
+				clusterRoleCacheMock: clusterRoleCache,
+			}
+			if test.stateSetup != nil {
+				test.stateSetup(state)
+			}
+			roleResolver := auth.NewRoleTemplateResolver(roleTemplateCache, clusterRoleCache)
+			validator := roletemplate.NewValidator(resolver, roleResolver, fakeSAR, grCache)
+			admitters := validator.Admitters()
+			r.Len(admitters, 1, "wanted only one admitter")
 			req := createRTRequest(r.T(), test.args.oldRT(), test.args.newRT(), test.args.username)
 			resp, err := admitters[0].Admit(req)
 			if r.NoError(err, "Admit failed") {
@@ -487,19 +566,13 @@ func (r *RoleTemplateSuite) Test_Create() {
 
 	ctrl := gomock.NewController(r.T())
 	roleTemplateCache := fake.NewMockNonNamespacedCacheInterface[*v3.RoleTemplate](ctrl)
-	roleTemplateCache.EXPECT().AddIndexer(expectedIndexerName, gomock.Any())
+	roleTemplateCache.EXPECT().AddIndexer(expectedIndexerName, gomock.Any()).AnyTimes()
 	roleTemplateCache.EXPECT().Get(r.adminRT.Name).Return(r.adminRT, nil).AnyTimes()
-	clusterRoleCache := fake.NewMockNonNamespacedCacheInterface[*rbacv1.ClusterRole](ctrl)
-	roleResolver := auth.NewRoleTemplateResolver(roleTemplateCache, clusterRoleCache)
 	grCache := fake.NewMockNonNamespacedCacheInterface[*v3.GlobalRole](ctrl)
-	grCache.EXPECT().AddIndexer(expectedGlobalRefIndex, gomock.Any())
+	grCache.EXPECT().AddIndexer(expectedGlobalRefIndex, gomock.Any()).AnyTimes()
 
 	k8Fake := &k8testing.Fake{}
 	fakeSAR := &k8fake.FakeSubjectAccessReviews{Fake: &k8fake.FakeAuthorizationV1{Fake: k8Fake}}
-
-	validator := roletemplate.NewValidator(resolver, roleResolver, fakeSAR, grCache)
-	admitters := validator.Admitters()
-	r.Len(admitters, 1, "wanted only one admitter")
 
 	tests := []tableTest{
 		{
@@ -581,6 +654,40 @@ func (r *RoleTemplateSuite) Test_Create() {
 			allowed: false,
 		},
 		{
+			name: "invalid external rules",
+			args: args{
+				username: adminUser,
+				oldRT: func() *v3.RoleTemplate {
+					return nil
+				},
+				newRT: func() *v3.RoleTemplate {
+					rt := newDefaultRT()
+					rt.External = true
+					rt.ExternalRules = []rbacv1.PolicyRule{r.ruleEmptyVerbs}
+					return rt
+				},
+			},
+			allowed:   false,
+			wantError: true,
+		},
+		{
+			name: "ExternalRules can't be set in RoleTemplates with external=false",
+			args: args{
+				username: adminUser,
+				oldRT: func() *v3.RoleTemplate {
+					return nil
+				},
+				newRT: func() *v3.RoleTemplate {
+					rt := newDefaultRT()
+					rt.External = false
+					rt.ExternalRules = r.manageNodeRole.Rules
+					return rt
+				},
+			},
+			allowed:   false,
+			wantError: true,
+		},
+		{
 			// Ensure we're not blocking the creation of RTs with
 			// NonResourceURLs included such as cluster-owner.
 			name: "ensure accept non resource urls",
@@ -625,8 +732,21 @@ func (r *RoleTemplateSuite) Test_Create() {
 		test := tests[i]
 		r.Run(test.name, func() {
 			r.T().Parallel()
+			clusterRoleCache := fake.NewMockNonNamespacedCacheInterface[*rbacv1.ClusterRole](ctrl)
+			state := testState{
+				clusterRoleCacheMock: clusterRoleCache,
+			}
+			if test.stateSetup != nil {
+				test.stateSetup(state)
+			}
+			roleResolver := auth.NewRoleTemplateResolver(roleTemplateCache, clusterRoleCache)
+			validator := roletemplate.NewValidator(resolver, roleResolver, fakeSAR, grCache)
+			admitters := validator.Admitters()
+			r.Len(admitters, 1, "wanted only one admitter")
+
 			req := createRTRequest(r.T(), test.args.oldRT(), test.args.newRT(), test.args.username)
 			resp, err := admitters[0].Admit(req)
+
 			r.NoError(err, "Admit failed")
 			r.Equalf(test.allowed, resp.Allowed, "Response was incorrectly validated wanted response.Allowed = '%v' got '%v' message=%+v", test.allowed, resp.Allowed, resp.Result)
 		})
