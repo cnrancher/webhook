@@ -19,6 +19,17 @@ steps:
       - name: docker
         path: /var/run/docker.sock
 
+  - name: integration-test
+    image: rancher/dapper:v0.6.0
+    environment:
+      OAUTH_TOKEN:
+        from_secret: github_token
+    commands:
+      - dapper integration-test-ci
+    volumes:
+      - name: docker
+        path: /var/run/docker.sock
+
   - name: github_binary_release
     image: plugins/github-release
     settings:
@@ -79,6 +90,17 @@ steps:
         from_secret: github_token
     commands:
       - dapper ci
+    volumes:
+      - name: docker
+        path: /var/run/docker.sock
+
+  - name: integration-test
+    image: rancher/dapper:v0.6.0
+    environment:
+      OAUTH_TOKEN:
+        from_secret: github_token
+    commands:
+      - dapper integration-test-ci
     volumes:
       - name: docker
         path: /var/run/docker.sock
