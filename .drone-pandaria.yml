@@ -99,6 +99,7 @@ steps:
     environment:
       OAUTH_TOKEN:
         from_secret: github_token
+      CI: "true"
     commands:
       - dapper integration-test-ci
     volumes:

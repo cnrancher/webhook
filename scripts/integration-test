@@ -31,4 +31,4 @@ k3d image import dist/rancher-webhook-image.tar -c webhook
 # start rancher
 VERSION=2.9 RANCHER_IMAGE_TAG=v2.9-head ./.github/workflows/scripts/start-rancher.sh
 
-IMAGE_REPO=cnrancher/webhook IMAGE_TAG=${TAG} CLUSTER_NAME=webhook ARCH=${ARCH} ./.github/workflows/scripts/integration-test-ci
+CI=${CI} IMAGE_REPO=cnrancher/webhook IMAGE_TAG=${TAG} CLUSTER_NAME=webhook ARCH=${ARCH} ./.github/workflows/scripts/integration-test-ci
