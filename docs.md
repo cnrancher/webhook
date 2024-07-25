@@ -51,7 +51,9 @@ If yes, the webhook redacts the role, so that it only grants a deletion permissi
 
 #### Escalation Prevention
 
-Users can only create/update ClusterRoleTemplateBindings which grant permissions to RoleTemplates with rights less than or equal to those they currently possess. This is to prevent privilege escalation. 
+Users can only create/update ClusterRoleTemplateBindings which grant permissions to RoleTemplates with rights less than or equal to those they currently possess. This is to prevent privilege escalation.
+For external RoleTemplates (RoleTemplates with `external` set to `true`), if the `external-rules` feature flag is enabled and `ExternalRules` is specified in the roleTemplate in `RoleTemplateName`,
+`ExternalRules` will be used for authorization. Otherwise (if the feature flag is off or `ExternalRules` are nil), the rules from the backing `ClusterRole` in the local cluster will be used.
 
 #### Invalid Fields - Create
 
@@ -90,6 +92,7 @@ In addition, as in the create validation, both a user subject and a group subjec
 #### On update
 
 The desired value must not change on new spec unless it's equal to the `lockedValue` or `lockedValue` is nil.
+Due to the security impact of the `external-rules` feature flag, only users with admin permissions (`*` verbs on `*` resources in `*` APIGroups in all namespaces) can enable or disable this feature flag.
 
 ## FleetWorkspace 
 
@@ -207,6 +210,8 @@ Adds the authz.management.cattle.io/creator-role-bindings annotation.
 
 Users can only create/update ProjectRoleTemplateBindings with rights less than or equal to those they currently possess.
 This is to prevent privilege escalation.
+For external RoleTemplates (RoleTemplates with `external` set to `true`), if the `external-rules` feature flag is enabled and `ExternalRules` is specified in the roleTemplate in `RoleTemplateName`,
+`ExternalRules` will be used for authorization. Otherwise, if `ExternalRules` are nil when the feature flag is on, the rules from the backing `ClusterRole` in the local cluster will be used.
 
 #### Invalid Fields - Create
 
@@ -256,11 +261,12 @@ Circular references to a `RoleTemplate` (a inherits b, b inherits a) are not all
 
 #### Rules Without Verbs, Resources, API groups
 
-Rules without verbs, resources, or apigroups are not permitted. The `rules` included in a RoleTemplate are of the same type as the rules used by standard Kubernetes RBAC types (such as `Roles` from `rbac.authorization.k8s.io/v1`). Because of this, they inherit the same restrictions as these types, including this one.
+Rules without verbs, resources, or apigroups are not permitted. The `rules` and `externalRules` included in a RoleTemplate are of the same type as the rules used by standard Kubernetes RBAC types (such as `Roles` from `rbac.authorization.k8s.io/v1`). Because of this, they inherit the same restrictions as these types, including this one.
 
 #### Escalation Prevention
 
 Users can only change RoleTemplates with rights less than or equal to those they currently possess. This prevents privilege escalation. 
+Users can't create external RoleTemplates (or update existing RoleTemplates) with `ExternalRules` without having the `escalate` verb on that RoleTemplate.
 
 #### Context Validation
 
@@ -280,3 +286,66 @@ If `roletemplates.builtin` is true then all fields are immutable except:
  ### Deletion check
 
 RoleTemplate can not be deleted if they are referenced by other RoleTemplates via `roletemplates.roleTemplateNames` or by GlobalRoles via `globalRoles.inheritedClusterRoles`
+
+## Setting 
+
+### Validation Checks
+
+#### Invalid Fields - Create
+
+When a Setting is created, the following checks take place:
+
+- If set, `disable-inactive-user-after` must be zero or a positive duration (e.g. `240h`).
+- If set, `delete-inactive-user-after` must be zero or a positive duration (e.g. `240h`).
+- If set, `user-last-login-default` must be a date time according to RFC3339 (e.g. `2023-11-29T00:00:00Z`).
+- If set, `user-retention-cron` must be a valid standard cron expression (e.g. `0 0 * * 0`).
+
+#### Invalid Fields - Update
+
+When a Setting is updated, the following checks take place:
+
+- If set, `disable-inactive-user-after` must be zero or a positive duration (e.g. `240h`).
+- If set, `delete-inactive-user-after` must be zero or a positive duration (e.g. `240h`).
+- If set, `user-last-login-default` must be a date time according to RFC3339 (e.g. `2023-11-29T00:00:00Z`).
+- If set, `user-retention-cron` must be a valid standard cron expression (e.g. `0 0 * * 1`).
+
+#### Forbidden - Update
+
+- If `agent-tls-mode` has `default` or `value` updated from `system-store` to `strict`, then all non-local clusters must
+  have a status condition `AgentTlsStrictCheck` set to `True`, unless the new setting has an overriding
+  annotation `cattle.io/force=true`.
+
+## UserAttribute 
+
+### Validation Checks
+
+#### Invalid Fields - Create
+
+When a UserAttribute is created, the following checks take place:
+
+- If set, `lastLogin` must be a valid date time according to RFC3339 (e.g. `2023-11-29T00:00:00Z`).
+- If set, `disableAfter` must be zero or a positive duration (e.g. `240h`).
+- If set, `deleteAfter` must be zero or a positive duration (e.g. `240h`).
+
+#### Invalid Fields - Update
+
+When a UserAttribute is updated, the following checks take place:
+
+- If set, `lastLogin` must be a valid date time according to RFC3339 (e.g. `2023-11-29T00:00:00Z`).
+- If set, `disableAfter` must be zero or a positive duration (e.g. `240h`).
+- If set, `deleteAfter` must be zero or a positive duration (e.g. `240h`).
+
+# provisioning.cattle.io/v1 
+
+## Cluster 
+
+### Mutation Checks
+
+#### On Update
+
+##### Dynamic Schema Drop
+
+Check for the presence of the `provisioning.cattle.io/allow-dynamic-schema-drop` annotation. If the value is `"true"`, 
+perform no mutations. If the value is not present or not `"true"`, compare the value of the `dynamicSchemaSpec` field 
+for each `machinePool`, to its' previous value. If the values are not identical, revert the value for the 
+`dynamicSchemaSpec` for the specific `machinePool`, but do not reject the request.

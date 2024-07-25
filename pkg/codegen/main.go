@@ -43,6 +43,7 @@ func main() {
 					v3.ProjectRoleTemplateBinding{},
 					v3.Node{},
 					v3.Project{},
+					v3.Feature{},
 				},
 			},
 			"provisioning.cattle.io": {
@@ -68,6 +69,7 @@ func main() {
 				&v3.ProjectRoleTemplateBinding{},
 				&v3.NodeDriver{},
 				&v3.Project{},
+				&v3.Setting{},
 			},
 		},
 		"provisioning.cattle.io": {
