@@ -57,9 +57,9 @@ func (v *Validator) Operations() []admissionregistrationv1.OperationType {
 
 // ValidatingWebhook returns the ValidatingWebhook.
 func (v *Validator) ValidatingWebhook(clientConfig admissionregistrationv1.WebhookClientConfig) []admissionregistrationv1.ValidatingWebhook {
-	return []admissionregistrationv1.ValidatingWebhook{
-		*admission.NewDefaultValidatingWebhook(v, clientConfig, admissionregistrationv1.ClusterScope, v.Operations()),
-	}
+	valWebhook := admission.NewDefaultValidatingWebhook(v, clientConfig, admissionregistrationv1.ClusterScope, v.Operations())
+	valWebhook.FailurePolicy = admission.Ptr(admissionregistrationv1.Ignore)
+	return []admissionregistrationv1.ValidatingWebhook{*valWebhook}
 }
 
 // Admitters returns the admitter objects.
@@ -135,7 +135,7 @@ func (a *admitter) validateAgentTLSMode(oldSetting, newSetting v3.Setting) error
 		return nil
 	}
 	if effectiveValue(oldSetting) == "system-store" && effectiveValue(newSetting) == "strict" {
-		if _, force := newSetting.Annotations["cattle.io/force"]; force {
+		if force := newSetting.Annotations["cattle.io/force"]; force == "true" {
 			return nil
 		}
 		clusters, err := a.clusterCache.List(labels.NewSelector())
