@@ -20,6 +20,7 @@ import (
 
 	"github.com/rancher/webhook/pkg/admission"
 	"github.com/rancher/webhook/pkg/resources/management.cattle.io/v3/setting"
+	admissionregistrationv1 "k8s.io/api/admissionregistration/v1"
 )
 
 type SettingSuite struct {
@@ -164,6 +165,16 @@ func (s *SettingSuite) validate(op v1.Operation) {
 	}
 }
 
+func (s *SettingSuite) TestValidatingWebhookFailurePolicy() {
+	t := s.T()
+	validator := setting.NewValidator(nil)
+
+	webhook := validator.ValidatingWebhook(admissionregistrationv1.WebhookClientConfig{})
+	require.Len(t, webhook, 1)
+	ignorePolicy := admissionregistrationv1.Ignore
+	require.Equal(t, &ignorePolicy, webhook[0].FailurePolicy)
+}
+
 func (s *SettingSuite) setup() admission.Admitter {
 	validator := setting.NewValidator(nil)
 	s.Len(validator.Admitters(), 1, "expected 1 admitter")
@@ -300,6 +311,40 @@ func TestValidateAgentTLSMode(t *testing.T) {
 			},
 			operation: v1.Update,
 			allowed:   true,
+		},
+		"update forbidden without cluster status and non-true force annotation": {
+			oldSetting: v3.Setting{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "agent-tls-mode",
+				},
+				Default: "system-store",
+			},
+			newSetting: v3.Setting{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "agent-tls-mode",
+					Annotations: map[string]string{
+						"cattle.io/force": "false",
+					},
+				},
+				Default: "strict",
+			},
+			clusters: []*v3.Cluster{
+				{
+					ObjectMeta: metav1.ObjectMeta{
+						Name: "cluster-1",
+					},
+					Status: v3.ClusterStatus{
+						Conditions: []v3.ClusterCondition{
+							{
+								Type:   "AgentTlsStrictCheck",
+								Status: "False",
+							},
+						},
+					},
+				},
+			},
+			operation: v1.Update,
+			allowed:   false,
 		},
 		"update allowed with cluster status and force annotation": {
 			oldSetting: v3.Setting{
@@ -571,8 +616,8 @@ func TestValidateAgentTLSMode(t *testing.T) {
 			t.Parallel()
 			ctrl := gomock.NewController(t)
 			clusterCache := fake.NewMockNonNamespacedCacheInterface[*v3.Cluster](ctrl)
-			_, force := tc.newSetting.Annotations["cattle.io/force"]
-			if tc.operation == v1.Update && !force && len(tc.clusters) > 0 {
+			force := tc.newSetting.Annotations["cattle.io/force"]
+			if tc.operation == v1.Update && force != "true" && len(tc.clusters) > 0 {
 				clusterCache.EXPECT().List(gomock.Any()).Return(tc.clusters, nil)
 			}
 			if tc.clusterListerFails {
