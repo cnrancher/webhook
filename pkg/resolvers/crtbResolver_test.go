@@ -278,7 +278,7 @@ func (c *CRTBResolverSuite) NewTestCRTBResolver() *CRTBRuleResolver {
 	roleTemplateCache.EXPECT().Get(c.readRT.Name).Return(c.readRT, nil).AnyTimes()
 	roleTemplateCache.EXPECT().Get(c.writeRT.Name).Return(c.writeRT, nil).AnyTimes()
 	roleTemplateCache.EXPECT().Get(invalidName).Return(nil, errNotFound).AnyTimes()
-	roleResolver := auth.NewRoleTemplateResolver(roleTemplateCache, clusterRoleCache)
+	roleResolver := auth.NewRoleTemplateResolver(roleTemplateCache, clusterRoleCache, nil)
 	return NewCRTBRuleResolver(crtbCache, roleResolver)
 }
 
@@ -294,7 +294,7 @@ func NewCRTBCache(ctrl *gomock.Controller, bindings []*apisv3.ClusterRoleTemplat
 		return nil, errNotFound
 	}).AnyTimes()
 	clusterCache.EXPECT().AddIndexer(crtbSubjectIndex, gomock.Any()).AnyTimes()
-	clusterCache.EXPECT().GetByIndex(crtbSubjectIndex, gomock.Any()).DoAndReturn(func(index string, subject string) ([]*apisv3.ClusterRoleTemplateBinding, error) {
+	clusterCache.EXPECT().GetByIndex(crtbSubjectIndex, gomock.Any()).DoAndReturn(func(_ string, subject string) ([]*apisv3.ClusterRoleTemplateBinding, error) {
 		retList := []*apisv3.ClusterRoleTemplateBinding{}
 		// for each binding create a lists of subject keys from the binding
 		// if the provided subject matches any of those keys at the binding to the returned list

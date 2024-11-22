@@ -20,11 +20,15 @@ steps:
         path: /var/run/docker.sock
 
   - name: integration-test
-    image: rancher/rancher:v2.7-head
-    privileged: true
+    image: rancher/dapper:v0.6.0
+    environment:
+      OAUTH_TOKEN:
+        from_secret: github_token
     commands:
-      - zypper -n install helm
-      - scripts/integration-test
+      - dapper integration-test-ci
+    volumes:
+      - name: docker
+        path: /var/run/docker.sock
 
   - name: github_binary_release
     image: plugins/github-release
@@ -91,11 +95,16 @@ steps:
         path: /var/run/docker.sock
 
   - name: integration-test
-    image: rancher/rancher:v2.7-head
-    privileged: true
+    image: rancher/dapper:v0.6.0
+    environment:
+      OAUTH_TOKEN:
+        from_secret: github_token
+      CI: "true"
     commands:
-      - zypper -n install helm
-      - scripts/integration-test
+      - dapper integration-test-ci
+    volumes:
+      - name: docker
+        path: /var/run/docker.sock
 
   - name: github_binary_release
     image: plugins/github-release
