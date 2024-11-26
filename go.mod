@@ -5,6 +5,7 @@ go 1.22.0
 toolchain go1.22.7
 
 replace (
+	github.com/rancher/rancher/pkg/apis => github.com/cnrancher/pandaria/pkg/apis v0.0.0-20241129074209-78e80e5808a7
 	github.com/rancher/rke => github.com/rancher/rke v1.6.2
 	k8s.io/api => k8s.io/api v0.31.1
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.31.1
@@ -42,7 +43,7 @@ require (
 	github.com/rancher/dynamiclistener v0.6.1
 	github.com/rancher/lasso v0.0.0-20240924233157-8f384efc8813
 	github.com/rancher/rancher/pkg/apis v0.0.0-20241107150810-8b9e1881ab4b
-	github.com/rancher/rke v1.7.0-rc.5
+	github.com/rancher/rke v1.7.0
 	github.com/rancher/wrangler/v3 v3.1.0
 	github.com/robfig/cron v1.2.0
 	github.com/sirupsen/logrus v1.9.3
@@ -70,6 +71,9 @@ require (
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
+	github.com/cnrancher/ack-operator v0.0.5-0.20240709124229-11f7682e76c8 // indirect
+	github.com/cnrancher/cce-operator v0.4.7-0.20240711035457-e0c05380e64b // indirect
+	github.com/cnrancher/tke-operator v0.0.0-20240709040941-2b6bd9b720ba // indirect
 	github.com/coreos/go-semver v0.3.1 // indirect
 	github.com/coreos/go-systemd/v22 v22.5.0 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
@@ -111,7 +115,7 @@ require (
 	github.com/prometheus/procfs v0.15.1 // indirect
 	github.com/rancher/aks-operator v1.10.0 // indirect
 	github.com/rancher/eks-operator v1.10.0 // indirect
-	github.com/rancher/fleet/pkg/apis v0.11.0-rc.2 // indirect
+	github.com/rancher/fleet/pkg/apis v0.11.0 // indirect
 	github.com/rancher/gke-operator v1.10.0 // indirect
 	github.com/rancher/norman v0.0.0-20241001183610-78a520c160ab // indirect
 	github.com/spf13/cobra v1.8.1 // indirect

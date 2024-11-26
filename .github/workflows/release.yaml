@@ -3,7 +3,7 @@ name: release
 on:
   push:
     tags:
-      - v*
+      - v*-todo
   workflow_dispatch:
 
 permissions:
@@ -11,12 +11,14 @@ permissions:
 
 env:
   REGISTRY: docker.io
-  REPO: rancher
+  REPO: cnrancher
 
 jobs:
   build:
     name: build and package
     runs-on: ubuntu-latest
+    env:
+      OAUTH_TOKEN: ${{ secrets.GH_TOKEN }}
     strategy:
       matrix:
         arch:
@@ -96,7 +98,7 @@ jobs:
         cd dist/artifacts
         gh --repo "${{ github.repository }}" release create ${{ github.ref_name }} --prerelease --verify-tag --generate-notes webhook-linux-* sha256sum-*.txt rancher-webhook*.tgz
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
   image:
     permissions:
@@ -128,13 +130,6 @@ jobs:
           cp -v dist/artifacts/webhook-linux-${{ matrix.arch }} bin/webhook
           chmod +x bin/webhook
 
-      - name: "Read vault secrets"
-        uses: rancher-eio/read-vault-secrets@main
-        with:
-          secrets: |
-            secret/data/github/repo/${{ github.repository }}/dockerhub/rancher/credentials username | DOCKER_USERNAME ;
-            secret/data/github/repo/${{ github.repository }}/dockerhub/rancher/credentials password | DOCKER_PASSWORD
-
       - name: Set up QEMU
         # https://github.com/docker/setup-qemu-action/releases/tag/v3.1.0
         uses: docker/setup-qemu-action@5927c834f5b4fdf503fca6f4c7eccda82949e1ee # v3.1.0
@@ -148,8 +143,8 @@ jobs:
         uses: docker/login-action@0d4c9c5ea7693da7b068278f7b52bda2a190a446 # v3.2.0
         with:
           registry: ${{ env.REGISTRY }}
-          username: ${{ env.DOCKER_USERNAME }}
-          password: ${{ env.DOCKER_PASSWORD }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build and push the webhook image
         id: build
@@ -194,20 +189,13 @@ jobs:
         uses: docker/setup-buildx-action@4fd812986e6c8c2a69e18311145f9371337f27d4 # v3.4.0
         # https://github.com/docker/setup-buildx-action/releases/tag/v3.4.0
 
-      - name: "Read vault secrets"
-        uses: rancher-eio/read-vault-secrets@main
-        with:
-          secrets: |
-            secret/data/github/repo/${{ github.repository }}/dockerhub/rancher/credentials username | DOCKER_USERNAME ;
-            secret/data/github/repo/${{ github.repository }}/dockerhub/rancher/credentials password | DOCKER_PASSWORD
-
       - name: Log in to the Container registry
         uses: docker/login-action@0d4c9c5ea7693da7b068278f7b52bda2a190a446 # v3.2.0
         # https://github.com/docker/login-action/releases/tag/v3.2.0
         with:
           registry: ${{ env.REGISTRY }}
-          username: ${{ env.DOCKER_USERNAME }}
-          password: ${{ env.DOCKER_PASSWORD }}
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
 
         # setup tag name
       - if: ${{ startsWith(github.ref, 'refs/tags/') }}
