@@ -5,7 +5,7 @@ go 1.22.0
 toolchain go1.22.7
 
 replace (
-	github.com/rancher/rancher/pkg/apis => github.com/cnrancher/pandaria/pkg/apis v0.0.0-20241104045144-efc7447f86bb
+	github.com/rancher/rancher/pkg/apis => github.com/cnrancher/pandaria/pkg/apis v0.0.0-20241217025934-6cc31a70f73e
 	github.com/rancher/rke => github.com/rancher/rke v1.6.2
 	k8s.io/api => k8s.io/api v0.30.1
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.30.1
@@ -42,9 +42,9 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/gorilla/mux v1.8.1
 	github.com/rancher/dynamiclistener v0.6.0
-	github.com/rancher/lasso v0.0.0-20240809125800-8da6f11865d5
-	github.com/rancher/rancher/pkg/apis v0.0.0-20240918011937-2f9a7509687f
-	github.com/rancher/rke v1.6.3
+	github.com/rancher/lasso v0.0.0-20240923125127-ae858d002589
+	github.com/rancher/rancher/pkg/apis v0.0.0-20241107190722-17b258997ea9
+	github.com/rancher/rke v1.6.4
 	github.com/rancher/wrangler/v3 v3.0.0
 	github.com/robfig/cron v1.2.0
 	github.com/sirupsen/logrus v1.9.3
@@ -70,7 +70,7 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
-	github.com/cespare/xxhash/v2 v2.2.0 // indirect
+	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cnrancher/ack-operator v0.0.5-0.20240709124229-11f7682e76c8 // indirect
 	github.com/cnrancher/cce-operator v0.4.7-0.20240711035457-e0c05380e64b // indirect
 	github.com/cnrancher/tke-operator v0.0.0-20240709040941-2b6bd9b720ba // indirect
@@ -112,10 +112,10 @@ require (
 	github.com/prometheus/client_model v0.6.1 // indirect
 	github.com/prometheus/common v0.47.0 // indirect
 	github.com/prometheus/procfs v0.14.0 // indirect
-	github.com/rancher/aks-operator v1.9.3 // indirect
-	github.com/rancher/eks-operator v1.9.3 // indirect
+	github.com/rancher/aks-operator v1.9.4 // indirect
+	github.com/rancher/eks-operator v1.9.4 // indirect
 	github.com/rancher/fleet/pkg/apis v0.10.0 // indirect
-	github.com/rancher/gke-operator v1.9.3 // indirect
+	github.com/rancher/gke-operator v1.9.4 // indirect
 	github.com/rancher/norman v0.0.0-20240708202514-a0127673d1b9 // indirect
 	github.com/spf13/cobra v1.8.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
