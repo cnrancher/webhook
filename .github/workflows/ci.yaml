@@ -5,16 +5,16 @@ name: Webhook CI
 on:
   push:
     branches:
-      - release/v*-todo
+      - release/v*
     paths-ignore:
       - '.gitignore'
       - 'CODEOWNERS'
       - 'LICENSE'
   pull_request:
     paths-ignore:
-    - '.gitignore'
-    - 'CODEOWNERS'
-    - 'LICENSE'
+      - '.gitignore'
+      - 'CODEOWNERS'
+      - 'LICENSE'
   workflow_dispatch:
 
 permissions:
@@ -27,10 +27,9 @@ jobs:
       fail-fast: false
       matrix:
         archBox:
-        - { arch: amd64, vmArch: x64 }
-#        - { arch: arm64, vmArch: arm64 }
-    runs-on: org-cnrancher-runner-k8s
-    container: ubuntu:22.04
+          - { arch: amd64, vmArch: x64 }
+          - { arch: arm64, vmArch: arm64 }
+    runs-on: runs-on,runner=1cpu-linux-${{ matrix.archBox.vmArch }},run-id=${{ github.run_id }}
     steps:
       - name : Checkout repository
         # https://github.com/actions/checkout/releases/tag/v4.1.1
@@ -41,6 +40,17 @@ jobs:
         uses: actions/setup-go@0c52d547c9bc32b1aa3301fd7a9cb496313a4491 # v5.0.0
         with:
           go-version-file: 'go.mod'
+
+      # TODO: Pull this next one out once there's a helm-release for rancher 2.9
+      - name: Checkout rancher/rancher and build the chart
+        run: |
+          mkdir -p "${{ runner.temp}}"
+          pushd "${{ runner.temp}}"
+          git clone --depth 1 -b release/v2.10 https://github.com/rancher/rancher.git rancherDir
+          cd rancherDir
+          ./scripts/chart/build chart
+          tar cfz "${{ runner.temp }}/rancher.tgz" -C build/chart/rancher .
+          popd
 
       - name: install K3d
         run: ./.github/workflows/scripts/install-k3d.sh
@@ -63,7 +73,9 @@ jobs:
       - name: start rancher
         run: ./.github/workflows/scripts/start-rancher.sh
         env:
-          RANCHER_IMAGE_TAG: "head"
+          CHART_PATH: "${{ runner.temp }}/rancher.tgz"
+          RANCHER_IMAGE_TAG: "v2.10-head"
+          VERSION: "2.10"
 
       - name: get vars
         run: cat dist/image_tag >> $GITHUB_ENV
@@ -73,5 +85,5 @@ jobs:
         env:
           ARCH: "${{ matrix.archBox.arch }}"
           CLUSTER_NAME: webhook
-          IMAGE_REPO: cnrancher/webhook
+          IMAGE_REPO: rancher/webhook
           IMAGE_TAG: "${{ env.IMAGE_TAG }}"
