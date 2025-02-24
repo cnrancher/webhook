@@ -31,8 +31,9 @@ jobs:
       matrix:
         archBox:
         - { arch: amd64, vmArch: x64 }
+        - { arch: arm64, vmArch: arm64 }
     # runs-on: runs-on,runner=1cpu-linux-${{ matrix.archBox.vmArch }},run-id=${{ github.run_id }}
-    runs-on: repo-pandaria-runner-dind-${{ matrix.archBox.vmArch }}
+    runs-on: repo-webhook-runner-dind-${{ matrix.archBox.vmArch }}
     steps:
       - name : Checkout repository
         # https://github.com/actions/checkout/releases/tag/v4.1.1
