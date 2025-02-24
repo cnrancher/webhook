@@ -29,11 +29,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        archBox:
-        - { arch: amd64, vmArch: x64 }
-        - { arch: arm64, vmArch: arm64 }
+        os:
+        - ubuntu-latest
+        - ubuntu-24.04-arm
     # runs-on: runs-on,runner=1cpu-linux-${{ matrix.archBox.vmArch }},run-id=${{ github.run_id }}
-    runs-on: repo-webhook-runner-dind-${{ matrix.archBox.vmArch }}
+    runs-on: ${{ matrix.os }}
     steps:
       - name : Checkout repository
         # https://github.com/actions/checkout/releases/tag/v4.1.1
@@ -45,18 +45,30 @@ jobs:
         with:
           go-version-file: 'go.mod'
 
-      - name: Install dependencies  # PANDARIA:
+      - name: Set arch variable
+        shell: bash
         run: |
-          sudo apt update
-          sudo apt -y install make
+          case "${{ runner.arch }}" in
+          "X64" )
+            echo "ARCH=amd64" >> $GITHUB_ENV
+            ;;
+          "ARM64" )
+            echo "ARCH=arm64" >> $GITHUB_ENV
+            ;;
+          esac
 
-      # TODO: Pull this next one out once there's a helm-release for rancher 2.9
+      - name: Install dependencies
+        shell: bash
+        run: |
+          curl -sL https://get.helm.sh/helm-v3.13.3-linux-${ARCH}.tar.gz | sudo tar xvzf - -C /usr/local/bin --strip-components=1
+          curl -sL https://dl.k8s.io/v1.28.11/kubernetes-client-linux-${ARCH}.tar.gz | sudo tar xvzf - -C /usr/local/bin --strip-components=3
+
       - name: Checkout rancher/rancher and build the chart
         run: |
           mkdir -p "${{ runner.temp}}"
           pushd "${{ runner.temp}}"
-          git clone --depth 1 -b main https://github.com/rancher/rancher.git rancherDir
-          cd rancherDir
+          git clone --depth 1 -b release/v2.8 https://github.com/rancher/rancher.git rancherDir-v2.8
+          cd rancherDir-v2.8
           ./scripts/chart/build chart
           tar cfz "${{ runner.temp }}/rancher.tgz" -C build/chart/rancher .
           popd
@@ -73,8 +85,8 @@ jobs:
         run: ./.github/workflows/scripts/setup-cluster.sh
         env:
           CLUSTER_NAME: webhook
-          K3S_VERSION: v1.28.9-k3s1
-          ARCH: "${{ matrix.archBox.arch }}"
+          K3S_VERSION: v1.28.11-k3s1
+          ARCH: "${ARCH}"
 
       - name: import image
         run: k3d image import dist/rancher-webhook-image.tar -c webhook
@@ -83,8 +95,8 @@ jobs:
         run: ./.github/workflows/scripts/start-rancher.sh
         env:
           CHART_PATH: "${{ runner.temp }}/rancher.tgz"
-          RANCHER_IMAGE_TAG: "head"
-          VERSION: "main"
+          RANCHER_IMAGE_TAG: "v2.8-head"
+          VERSION: "2.8"
 
       - name: get vars
         run: cat dist/image_tag >> $GITHUB_ENV
@@ -92,7 +104,7 @@ jobs:
       - name: Run integration tests
         run: ./.github/workflows/scripts/integration-test-ci
         env:
-          ARCH: "${{ matrix.archBox.arch }}"
+          ARCH: "${ARCH}"
           CLUSTER_NAME: webhook
           IMAGE_REPO: cnrancher/webhook
           IMAGE_TAG: "${{ env.IMAGE_TAG }}"

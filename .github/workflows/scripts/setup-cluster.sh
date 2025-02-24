@@ -60,7 +60,7 @@ wait_for_nodes(){
 k3d registry create gha -p 42765
 k3d cluster create $CLUSTER_NAME --servers 1 --agents 1 \
     --registry-use gha:42765 \
-    --image "rancher/k3s:${K3S_VERSION}" --api-port 6550
+    --image "rancher/k3s:${K3S_VERSION}" --api-port 0.0.0.0:6550
 
 wait_for_nodes
 
