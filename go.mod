@@ -41,19 +41,19 @@ replace (
 
 require (
 	github.com/blang/semver v3.5.1+incompatible
-	github.com/evanphx/json-patch v5.6.0+incompatible
+	github.com/evanphx/json-patch v5.9.11+incompatible
 	github.com/golang/mock v1.6.0
-	github.com/gorilla/mux v1.8.0
+	github.com/gorilla/mux v1.8.1
 	github.com/rancher/dynamiclistener v0.4.0
 	github.com/rancher/lasso v0.1.0
-	github.com/rancher/rancher/pkg/apis v0.0.0-20250121135817-bfaaf7d60643
+	github.com/rancher/rancher/pkg/apis v0.0.0-20250317215908-5cc17ed521b4
 	github.com/rancher/rke v1.5.15
 	github.com/rancher/wrangler/v2 v2.1.4
 	github.com/robfig/cron v1.2.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.10.0
 	golang.org/x/exp v0.0.0-20240719175910-8a7402abbf56
-	golang.org/x/text v0.21.0
+	golang.org/x/text v0.22.0
 	golang.org/x/tools v0.28.0
 	k8s.io/api v0.30.0
 	k8s.io/apimachinery v0.30.0
@@ -121,7 +121,7 @@ require (
 	github.com/rancher/eks-operator v1.3.7 // indirect
 	github.com/rancher/fleet/pkg/apis v0.9.13 // indirect
 	github.com/rancher/gke-operator v1.2.7 // indirect
-	github.com/rancher/norman v0.0.0-20240206180703-6eda4bc94b4c // indirect
+	github.com/rancher/norman v0.2.0 // indirect
 	github.com/spf13/cobra v1.7.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/stoewer/go-strcase v1.2.0 // indirect
@@ -144,7 +144,7 @@ require (
 	golang.org/x/mod v0.22.0 // indirect
 	golang.org/x/net v0.34.0 // indirect
 	golang.org/x/oauth2 v0.25.0 // indirect
-	golang.org/x/sync v0.10.0 // indirect
+	golang.org/x/sync v0.11.0 // indirect
 	golang.org/x/sys v0.29.0 // indirect
 	golang.org/x/term v0.28.0 // indirect
 	golang.org/x/time v0.5.0 // indirect
