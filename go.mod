@@ -5,7 +5,7 @@ go 1.22.0
 toolchain go1.22.7
 
 replace (
-	github.com/rancher/rancher/pkg/apis => github.com/cnrancher/pandaria/pkg/apis v0.0.0-20250206060047-5b9b208addd9
+	github.com/rancher/rancher/pkg/apis => github.com/cnrancher/pandaria/pkg/apis v0.0.0-20250403012834-02333d1f4a31
 	github.com/rancher/rke => github.com/rancher/rke v1.5.13
 	k8s.io/api => k8s.io/api v0.28.6
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.28.6

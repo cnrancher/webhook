@@ -77,8 +77,8 @@ github.com/cnrancher/ack-operator v0.0.5-0.20240301031542-f503388fe440 h1:4E6KOD
 github.com/cnrancher/ack-operator v0.0.5-0.20240301031542-f503388fe440/go.mod h1:dQhJiahT0vf84VYkc8haqTqyksUnN60AL3doKpJpits=
 github.com/cnrancher/cce-operator v0.4.6 h1:ml0FnFEB0hyT6+8B2nos5stzyT9IazXAaOuoxkTlnLw=
 github.com/cnrancher/cce-operator v0.4.6/go.mod h1:SPhrWtS/udnrKd9nfVrwjoWAyRTT9GWdxUZgmQQ1GE0=
-github.com/cnrancher/pandaria/pkg/apis v0.0.0-20250206060047-5b9b208addd9 h1:tr+WBmD6UDgHskpsueDgXagqvq5ZmF4VoFYWVjgj5Dc=
-github.com/cnrancher/pandaria/pkg/apis v0.0.0-20250206060047-5b9b208addd9/go.mod h1:8twpMrid5LmcRP6SBWbABR+iG6nlLTSZ0v2e+owiYVo=
+github.com/cnrancher/pandaria/pkg/apis v0.0.0-20250403012834-02333d1f4a31 h1:bdbV4eQPqZi2VR5Ck0ucg3yegtqM/5KUXCtwj6ZTBDI=
+github.com/cnrancher/pandaria/pkg/apis v0.0.0-20250403012834-02333d1f4a31/go.mod h1:3lxeyARvNUaRTSmTckKxmysh+j/odg4nzCAhB12nUcQ=
 github.com/cnrancher/tke-operator v0.0.0-20240229091109-62dd98478d65 h1:8rfuDHRvFgF8akJ5f1DDB0DRHzXOd8Fv+IS9iJTLInY=
 github.com/cnrancher/tke-operator v0.0.0-20240229091109-62dd98478d65/go.mod h1:cNj3xQriEWx3cKpwUcNpjWftRPSPKWXmabM/tbQVYkw=
 github.com/coreos/go-semver v0.3.1 h1:yi21YpKnrx1gt5R+la8n5WgS0kCrsPp33dmEyHReZr4=
