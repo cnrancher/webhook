@@ -5,7 +5,7 @@ go 1.23.0
 toolchain go1.23.6
 
 replace (
-	github.com/rancher/rancher/pkg/apis => github.com/cnrancher/pandaria/pkg/apis v0.0.0-20250304070537-a8a5c853c646
+	github.com/rancher/rancher/pkg/apis => github.com/cnrancher/pandaria/pkg/apis v0.0.0-20250408074711-427ed9d7d421
 	github.com/rancher/rke => github.com/rancher/rke v1.7.2
 	k8s.io/api => k8s.io/api v0.31.1
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.31.1
@@ -42,14 +42,13 @@ require (
 	github.com/gorilla/mux v1.8.1
 	github.com/rancher/dynamiclistener v0.6.1
 	github.com/rancher/lasso v0.2.0
-	github.com/rancher/rancher/pkg/apis v0.0.0-20250121135804-5f4dc711332d
-	github.com/rancher/rke v1.7.3
+	github.com/rancher/rancher/pkg/apis v0.0.0-20250324135738-20db670c10a0
+	github.com/rancher/rke v1.7.5
 	github.com/rancher/wrangler/v3 v3.1.0
 	github.com/robfig/cron v1.2.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.10.0
 	go.uber.org/mock v0.5.0
-	golang.org/x/exp v0.0.0-20250210185358-939b2ce775ac
 	golang.org/x/text v0.22.0
 	golang.org/x/tools v0.30.0
 	k8s.io/api v0.31.1
@@ -59,7 +58,7 @@ require (
 	k8s.io/kubernetes v1.31.1
 	k8s.io/pod-security-admission v0.31.1
 	k8s.io/utils v0.0.0-20240902221715-702e33fdd3c3
-	sigs.k8s.io/controller-runtime v0.19.4
+	sigs.k8s.io/controller-runtime v0.19.6
 	sigs.k8s.io/yaml v1.4.0
 )
 
@@ -71,7 +70,7 @@ require (
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
-	github.com/cnrancher/ack-operator v0.0.5-0.20241128064712-80cd5c093154 // indirect
+	github.com/cnrancher/ack-operator v0.0.5-0.20250401014136-d5f811965a0c // indirect
 	github.com/cnrancher/cce-operator v0.6.0-beta.1 // indirect
 	github.com/cnrancher/tke-operator v0.0.0-20241220083730-57e5f4df8c62 // indirect
 	github.com/coreos/go-semver v0.3.1 // indirect
@@ -113,10 +112,10 @@ require (
 	github.com/prometheus/client_model v0.6.1 // indirect
 	github.com/prometheus/common v0.55.0 // indirect
 	github.com/prometheus/procfs v0.15.1 // indirect
-	github.com/rancher/aks-operator v1.10.2 // indirect
-	github.com/rancher/eks-operator v1.10.2 // indirect
+	github.com/rancher/aks-operator v1.10.3 // indirect
+	github.com/rancher/eks-operator v1.10.3 // indirect
 	github.com/rancher/fleet/pkg/apis v0.11.3 // indirect
-	github.com/rancher/gke-operator v1.10.2 // indirect
+	github.com/rancher/gke-operator v1.10.3 // indirect
 	github.com/rancher/norman v0.4.1 // indirect
 	github.com/spf13/cobra v1.8.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
@@ -137,9 +136,10 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.27.0 // indirect
 	golang.org/x/crypto v0.33.0 // indirect
+	golang.org/x/exp v0.0.0-20250210185358-939b2ce775ac // indirect
 	golang.org/x/mod v0.23.0 // indirect
 	golang.org/x/net v0.35.0 // indirect
-	golang.org/x/oauth2 v0.25.0 // indirect
+	golang.org/x/oauth2 v0.26.0 // indirect
 	golang.org/x/sync v0.11.0 // indirect
 	golang.org/x/sys v0.30.0 // indirect
 	golang.org/x/term v0.29.0 // indirect
