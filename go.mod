@@ -9,7 +9,7 @@ replace (
 	github.com/prometheus/client_golang => github.com/prometheus/client_golang v1.16.0
 	github.com/prometheus/client_model => github.com/prometheus/client_model v0.4.0
 	github.com/prometheus/common => github.com/prometheus/common v0.44.0
-	github.com/rancher/rancher/pkg/apis => github.com/cnrancher/pandaria/pkg/apis v0.0.0-20250429074007-9cfed859f7a8
+	github.com/rancher/rancher/pkg/apis => github.com/cnrancher/pandaria/pkg/apis v0.0.0-20250530092948-efa6b6c956d5
 	github.com/rancher/rke => github.com/rancher/rke v1.6.4
 	k8s.io/api => k8s.io/api v0.30.1
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.30.1
@@ -49,23 +49,22 @@ require (
 	github.com/gorilla/mux v1.8.1
 	github.com/rancher/dynamiclistener v0.6.1
 	github.com/rancher/lasso v0.2.1
-	github.com/rancher/rancher/pkg/apis v0.0.0-20250417070417-fdd320b560ae
-	github.com/rancher/rke v1.6.9
+	github.com/rancher/rancher/pkg/apis v0.0.0-20250519122550-fbb7aeae2e33
+	github.com/rancher/rke v1.6.10
 	github.com/rancher/wrangler/v3 v3.1.0
 	github.com/robfig/cron v1.2.0
 	github.com/sirupsen/logrus v1.9.3
 	github.com/stretchr/testify v1.10.0
-	go.uber.org/mock v0.5.0
-	golang.org/x/exp v0.0.0-20250210185358-939b2ce775ac
-	golang.org/x/text v0.23.0
-	golang.org/x/tools v0.30.0
+	go.uber.org/mock v0.5.2
+	golang.org/x/text v0.25.0
+	golang.org/x/tools v0.31.0
 	k8s.io/api v0.32.1
 	k8s.io/apimachinery v0.32.1
 	k8s.io/apiserver v0.31.1
 	k8s.io/client-go v12.0.0+incompatible
 	k8s.io/kubernetes v1.30.10
 	k8s.io/pod-security-admission v0.30.1
-	k8s.io/utils v0.0.0-20241104100929-3ea5e8cea738
+	k8s.io/utils v0.0.0-20250502105355-0f33e8f1c979
 	sigs.k8s.io/controller-runtime v0.19.0
 	sigs.k8s.io/yaml v1.4.0
 )
@@ -120,10 +119,10 @@ require (
 	github.com/prometheus/client_model v0.6.1 // indirect
 	github.com/prometheus/common v0.55.0 // indirect
 	github.com/prometheus/procfs v0.15.1 // indirect
-	github.com/rancher/aks-operator v1.9.8 // indirect
-	github.com/rancher/eks-operator v1.9.8 // indirect
-	github.com/rancher/fleet/pkg/apis v0.10.11 // indirect
-	github.com/rancher/gke-operator v1.9.8 // indirect
+	github.com/rancher/aks-operator v1.9.9 // indirect
+	github.com/rancher/eks-operator v1.9.9 // indirect
+	github.com/rancher/fleet/pkg/apis v0.10.13 // indirect
+	github.com/rancher/gke-operator v1.9.9 // indirect
 	github.com/rancher/norman v0.3.1 // indirect
 	github.com/spf13/cobra v1.8.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
@@ -142,13 +141,14 @@ require (
 	go.opentelemetry.io/proto/otlp v1.3.1 // indirect
 	go.uber.org/multierr v1.11.0 // indirect
 	go.uber.org/zap v1.26.0 // indirect
-	golang.org/x/crypto v0.36.0 // indirect
-	golang.org/x/mod v0.23.0 // indirect
-	golang.org/x/net v0.37.0 // indirect
-	golang.org/x/oauth2 v0.28.0 // indirect
-	golang.org/x/sync v0.12.0 // indirect
-	golang.org/x/sys v0.31.0 // indirect
-	golang.org/x/term v0.30.0 // indirect
+	golang.org/x/crypto v0.38.0 // indirect
+	golang.org/x/exp v0.0.0-20230905200255-921286631fa9 // indirect
+	golang.org/x/mod v0.24.0 // indirect
+	golang.org/x/net v0.40.0 // indirect
+	golang.org/x/oauth2 v0.29.0 // indirect
+	golang.org/x/sync v0.14.0 // indirect
+	golang.org/x/sys v0.33.0 // indirect
+	golang.org/x/term v0.32.0 // indirect
 	golang.org/x/time v0.7.0 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.4.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20240528184218-531527333157 // indirect
