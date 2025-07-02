@@ -458,8 +458,11 @@ func (p *provisioningAdmitter) validatePSACT(request *admission.Request, respons
 				return fmt.Errorf("[provisioning cluster validator] machineSelectorFile for PSA should not be in the cluster Spec")
 			}
 			// validate that the flags are not set
-			args := getKubeAPIServerArg(cluster)
-			if value, ok := args[kubeAPIAdmissionConfigOption]; ok && value == mountPath {
+			args, err := getKubeAPIServerArgs(cluster)
+			if err != nil {
+				return fmt.Errorf("[provisioning cluster validator] failed to get the kube-apiserver arguments: %w", err)
+			}
+			if args.keyHasValue(kubeAPIAdmissionConfigOption, mountPath) {
 				return fmt.Errorf("[provisioning cluster validator] admission-control-config-file under kube-apiserver-arg should not be set to %s", mountPath)
 			}
 		} else {
@@ -501,8 +504,11 @@ func (p *provisioningAdmitter) validatePSACT(request *admission.Request, respons
 				return fmt.Errorf("[provisioning cluster validator] machineSelectorFile for PSA should be in the cluster Spec")
 			}
 			// validate that the flags are set
-			args := getKubeAPIServerArg(cluster)
-			if val, ok := args[kubeAPIAdmissionConfigOption]; !ok || val != mountPath {
+			args, err := getKubeAPIServerArgs(cluster)
+			if err != nil {
+				return fmt.Errorf("[provisioning cluster validator] failed to get the kube-apiserver arguments: %w", err)
+			}
+			if !args.keyHasValue(kubeAPIAdmissionConfigOption, mountPath) {
 				return fmt.Errorf("[provisioning cluster validator] admission-control-config-file under kube-apiserver-arg should be set to %s", mountPath)
 			}
 		}
