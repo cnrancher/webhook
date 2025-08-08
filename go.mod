@@ -5,6 +5,7 @@ go 1.24.0
 toolchain go1.24.2
 
 replace (
+	github.com/rancher/rancher/pkg/apis => github.com/cnrancher/pandaria/pkg/apis v0.0.0-20250822023006-41f4b82e39a6
 	github.com/rancher/rke => github.com/rancher/rke v1.7.2
 	k8s.io/api => k8s.io/api v0.33.1
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.33.1
@@ -46,7 +47,7 @@ require (
 	github.com/rancher/jsonpath v0.0.0-20250620213443-ad24535cf0c1
 	github.com/rancher/lasso v0.2.3
 	github.com/rancher/rancher/pkg/apis v0.0.0-20250724110704-3809a50b0453
-	github.com/rancher/rke v1.8.0-rc.4
+	github.com/rancher/rke v1.8.0
 	github.com/rancher/wrangler/v3 v3.2.2
 	github.com/robfig/cron v1.2.0
 	github.com/sirupsen/logrus v1.9.3
@@ -70,6 +71,9 @@ require (
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
+	github.com/cnrancher/ack-operator v0.0.5-0.20250401014136-d5f811965a0c // indirect
+	github.com/cnrancher/cce-operator v0.7.0 // indirect
+	github.com/cnrancher/tke-operator v0.0.0-20250217080435-aa3d048bb4c7 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
 	github.com/distribution/reference v0.6.0 // indirect
 	github.com/emicklei/go-restful/v3 v3.12.2 // indirect
