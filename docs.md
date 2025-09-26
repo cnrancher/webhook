@@ -518,6 +518,10 @@ When a Token is updated, the following checks take place:
 
 ### Validation Checks
 
+#### Create and Delete
+
+Verifies there aren't any other users with the same username.
+
 #### Update and Delete
 
 When a user is updated or deleted, a check occurs to ensure that the user making the request has permissions greater than or equal to the user being updated or deleted. To get the user's groups, the user's UserAttributes are checked. This is best effort, because UserAttributes are only updated when a User logs in, so it may not be perfectly up to date.
@@ -579,6 +583,8 @@ following:
 - Attempts to include shell expressions (e.g. `$(command)` or `` `command` ``)
 - Equal to another data directory
 - Attempts to nest another data directory
+
+If the action is an update, and the old cluster had a `nil` `.spec.rkeConfig`, accept the request, since this is how rancherd operates, and is required for harvester installations.
 
 ##### Etcd S3 CloudCredential Secret
 
