@@ -6,7 +6,7 @@ toolchain go1.24.6
 
 replace (
 	github.com/google/cel-go => github.com/google/cel-go v0.22.0
-	github.com/rancher/rancher/pkg/apis => github.com/cnrancher/pandaria/pkg/apis v0.0.0-20250926034104-d740da06a5d1
+	github.com/rancher/rancher/pkg/apis => github.com/cnrancher/pandaria/pkg/apis v0.0.0-20251125102349-6f19ff69cad1
 	github.com/rancher/rke => github.com/rancher/rke v1.8.4
 	k8s.io/api => k8s.io/api v0.32.1
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.32.1
@@ -45,9 +45,9 @@ require (
 	github.com/evanphx/json-patch v5.9.11+incompatible
 	github.com/go-ldap/ldap/v3 v3.4.10
 	github.com/gorilla/mux v1.8.1
-	github.com/rancher/dynamiclistener v0.6.2
+	github.com/rancher/dynamiclistener v0.6.4
 	github.com/rancher/lasso v0.2.4
-	github.com/rancher/rancher/pkg/apis v0.0.0-20250919133431-8e6245f06426
+	github.com/rancher/rancher/pkg/apis v0.0.0-20251117152414-4c6aae24ab59
 	github.com/rancher/rke v1.8.5
 	github.com/rancher/wrangler/v3 v3.2.4
 	github.com/robfig/cron v1.2.0
@@ -120,10 +120,10 @@ require (
 	github.com/prometheus/client_model v0.6.1 // indirect
 	github.com/prometheus/common v0.62.0 // indirect
 	github.com/prometheus/procfs v0.15.1 // indirect
-	github.com/rancher/aks-operator v1.11.6 // indirect
-	github.com/rancher/eks-operator v1.11.6 // indirect
+	github.com/rancher/aks-operator v1.11.7 // indirect
+	github.com/rancher/eks-operator v1.11.7 // indirect
 	github.com/rancher/fleet/pkg/apis v0.12.3 // indirect
-	github.com/rancher/gke-operator v1.11.6 // indirect
+	github.com/rancher/gke-operator v1.11.7 // indirect
 	github.com/rancher/norman v0.5.2 // indirect
 	github.com/spf13/cobra v1.8.1 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
