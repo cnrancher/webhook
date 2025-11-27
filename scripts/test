@@ -6,7 +6,7 @@ cd $(dirname $0)/..
 go test ./tests/integration/... -c -o ./bin/rancher-webhook-integration.test
 
 echo "Running tests"
-go test --coverpkg=./pkg/... -coverprofile=coverage.out --count=1 ./pkg/...
+go test --coverpkg=./pkg/... -coverprofile=coverage.out -count=1 ./pkg/...
 cat coverage.out |
     awk 'BEGIN {cov=0; stat=0;} \
         $3!="" { cov+=($3==1?$2:0); stat+=$2; } \

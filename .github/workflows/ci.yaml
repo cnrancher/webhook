@@ -30,8 +30,8 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-latest
-          - ubuntu-24.04-arm
+          - org-cnrancher-runner-dind-x64
+          - org-cnrancher-runner-dind-arm64
     runs-on: ${{ matrix.os }}
     steps:
       - name : Checkout repository
@@ -78,6 +78,11 @@ jobs:
         env:
           K3D_VERSION: latest
 
+      - name: "PANDARIA: install make"
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential
+
       - name: ci
         run: make ci
 
@@ -95,7 +100,7 @@ jobs:
         run: ./.github/workflows/scripts/start-rancher.sh
         env:
           CHART_PATH: "${{ runner.temp }}/rancher.tgz"
-          RANCHER_IMAGE_TAG: "v2.11-head"                                                                                                                                  
+          RANCHER_IMAGE_TAG: "v2.11-head"
           VERSION: "2.11"
 
       - name: get vars
