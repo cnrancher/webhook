@@ -23,7 +23,7 @@ SUFFIX="-${ARCH}"
 HELM_TAG="${HELM_TAG:-${TAG:-${VERSION}}}"
 HELM_CHART_VERSION="${HELM_CHART_VERSION:-${HELM_TAG/v/}}"
 TAG="${TAG:-${VERSION}${SUFFIX}}"
-REPO="${REPO:-rancher}"
+REPO="${REPO:-cnrancher}"
 
 if echo $TAG | grep -q dirty; then
     TAG=dev

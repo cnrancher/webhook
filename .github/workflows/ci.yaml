@@ -20,16 +20,19 @@ on:
 permissions:
   contents: read
 
+env:
+  OAUTH_TOKEN: ${{ secrets.RD_ONLY_GH_TOKEN }}
+
 jobs:
   build:
     name: CI
     strategy:
       fail-fast: false
       matrix:
-        archBox:
-        - { arch: amd64, vmArch: x64 }
-        - { arch: arm64, vmArch: arm64 }
-    runs-on: runs-on,runner=1cpu-linux-${{ matrix.archBox.vmArch }},run-id=${{ github.run_id }}
+        os:
+          - org-cnrancher-runner-dind-x64
+          - org-cnrancher-runner-dind-arm64
+    runs-on: ${{ matrix.os }}
     steps:
       - name : Checkout repository
         # https://github.com/actions/checkout/releases/tag/v4.1.1
@@ -44,6 +47,24 @@ jobs:
         uses: golangci/golangci-lint-action@55c2c1448f86e01eaae002a5a3a9624417608d84 # v6.5.2
         with:
           version: v1.64.8
+
+      - name: Set arch variable
+        shell: bash
+        run: |
+          case "${{ runner.arch }}" in
+          "X64" )
+            echo "ARCH=amd64" >> $GITHUB_ENV
+            ;;
+          "ARM64" )
+            echo "ARCH=arm64" >> $GITHUB_ENV
+            ;;
+          esac
+
+      - name: Install dependencies
+        shell: bash
+        run: |
+          curl -sL https://get.helm.sh/helm-v3.13.3-linux-${ARCH}.tar.gz | sudo tar xvzf - -C /usr/local/bin --strip-components=1
+          curl -sL https://dl.k8s.io/v1.28.11/kubernetes-client-linux-${ARCH}.tar.gz | sudo tar xvzf - -C /usr/local/bin --strip-components=3
 
       # TODO: Pull this next one out once there's a helm-release for rancher 2.9
       - name: Checkout rancher/rancher and build the chart
@@ -60,6 +81,11 @@ jobs:
         run: ./.github/workflows/scripts/install-k3d.sh
         env:
           K3D_VERSION: latest
+      
+      - name: "PANDARIA: install make"
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential
 
       - name: ci
         run: make ci
@@ -87,7 +113,7 @@ jobs:
       - name: Run integration tests
         run: ./.github/workflows/scripts/integration-test-ci
         env:
-          ARCH: "${{ matrix.archBox.arch }}"
+          ARCH: "${ARCH}"
           CLUSTER_NAME: webhook
-          IMAGE_REPO: rancher/webhook
+          IMAGE_REPO: cnrancher/webhook
           IMAGE_TAG: "${{ env.IMAGE_TAG }}"
