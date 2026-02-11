@@ -5,7 +5,7 @@ go 1.24.0
 toolchain go1.24.2
 
 replace (
-	github.com/rancher/rancher/pkg/apis => github.com/cnrancher/pandaria/pkg/apis v0.0.0-20251229024512-7500c42580b0
+	github.com/rancher/rancher/pkg/apis => github.com/cnrancher/pandaria/pkg/apis v0.0.0-20260210083021-51747c676741
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.34.1
 	k8s.io/cli-runtime => k8s.io/cli-runtime v0.34.1
 	k8s.io/client-go => k8s.io/client-go v0.34.1
@@ -40,7 +40,7 @@ require (
 	github.com/rancher/dynamiclistener v0.7.3
 	github.com/rancher/jsonpath v0.0.0-20250620213443-ad24535cf0c1
 	github.com/rancher/lasso v0.2.5
-	github.com/rancher/rancher/pkg/apis v0.0.0-20251117171221-a46d3103379c
+	github.com/rancher/rancher/pkg/apis v0.0.0-20260115212751-7e496edc167e
 	github.com/rancher/rke v1.8.6
 	github.com/rancher/wrangler/v3 v3.3.1
 	github.com/robfig/cron v1.2.0
@@ -49,11 +49,11 @@ require (
 	go.uber.org/mock v0.6.0
 	golang.org/x/text v0.30.0
 	golang.org/x/tools v0.37.0
-	k8s.io/api v0.34.2
+	k8s.io/api v0.34.3
 	k8s.io/apimachinery v0.34.3
-	k8s.io/apiserver v0.34.2
+	k8s.io/apiserver v0.34.3
 	k8s.io/client-go v12.0.0+incompatible
-	k8s.io/kubernetes v1.34.1
+	k8s.io/kubernetes v1.34.3
 	k8s.io/pod-security-admission v0.34.1
 	k8s.io/utils v0.0.0-20251002143259-bc988d571ff4
 	sigs.k8s.io/controller-runtime v0.22.3
@@ -101,7 +101,7 @@ require (
 	github.com/rancher/aks-operator v1.13.1 // indirect
 	github.com/rancher/ali-operator v1.13.0 // indirect
 	github.com/rancher/eks-operator v1.13.1 // indirect
-	github.com/rancher/fleet/pkg/apis v0.14.1-0.20251210150425-9e77da0d13fd // indirect
+	github.com/rancher/fleet/pkg/apis v0.14.2 // indirect
 	github.com/rancher/gke-operator v1.13.1 // indirect
 	//TODO: Replace with a tag during un-rc'ing
 	github.com/rancher/norman v0.7.2 // indirect
@@ -121,13 +121,13 @@ require (
 	golang.org/x/time v0.14.0 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.5.0 // indirect
 	google.golang.org/protobuf v1.36.10 // indirect
-	gopkg.in/evanphx/json-patch.v4 v4.12.0 // indirect
+	gopkg.in/evanphx/json-patch.v4 v4.12.0
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/apiextensions-apiserver v0.34.1 // indirect
+	k8s.io/apiextensions-apiserver v0.34.3 // indirect
 	k8s.io/code-generator v0.34.1 // indirect
-	k8s.io/component-base v0.34.2 // indirect
+	k8s.io/component-base v0.34.3 // indirect
 	k8s.io/component-helpers v0.34.1 // indirect
 	k8s.io/controller-manager v0.34.1 // indirect
 	k8s.io/gengo v0.0.0-20250130153323-76c5745d3511 // indirect
@@ -136,7 +136,7 @@ require (
 	k8s.io/kube-aggregator v0.34.1 // indirect
 	k8s.io/kube-openapi v0.0.0-20250710124328-f3f2b991d03b // indirect
 	k8s.io/kubelet v0.0.0 // indirect
-	sigs.k8s.io/cluster-api v1.10.6 // indirect
+	sigs.k8s.io/cluster-api v1.10.6
 	sigs.k8s.io/json v0.0.0-20241014173422-cfa47c3a1cc8 // indirect
 	sigs.k8s.io/randfill v1.0.0 // indirect
 	sigs.k8s.io/structured-merge-diff/v6 v6.3.0 // indirect
