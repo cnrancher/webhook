@@ -15,10 +15,16 @@ ARG VERSION
 ARG COMMIT
 ARG LINKFLAGS="-extldflags -static -s"
 ARG LDFLAGS="-X main.Version=${VERSION} -X main.GitCommit=${COMMIT} ${LINKFLAGS}"
+ARG GOPRIVATE
+ARG RD_ONLY_GH_TOKEN
 
 # Download dependencies
 COPY go.mod go.sum ./
-RUN --mount=type=cache,target=/root/.cache,id=rancher go mod download
+RUN --mount=type=secret,id=token \
+    TOKEN=$(cat /run/secrets/token 2>/dev/null); \
+    TOKEN=${TOKEN:-${RD_ONLY_GH_TOKEN}} && \
+    git config --global url."https://${TOKEN}:x-oauth-basic@github.com/".insteadOf "https://github.com/" && \
+    GOPRIVATE=${GOPRIVATE} go mod download
 
 # ===============
 # Webhook Binary Build Stage

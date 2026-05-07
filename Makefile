@@ -25,6 +25,8 @@ build:
 		--target binary \
 		--build-arg VERSION=$${VERSION} \
 		--build-arg COMMIT=$${COMMIT} \
+		--build-arg GOPRIVATE=$${GOPRIVATE} \
+		--build-arg RD_ONLY_GH_TOKEN=$${OAUTH_TOKEN} \
 		--platform=$(PLATFORM) \
 		--output=type=local,dest=./bin \
 		. '
@@ -38,6 +40,7 @@ integration-test-binary:
 		--target integration-test-binary \
 		--platform=$(PLATFORM) \
 		--output=type=local,dest=./bin \
+		--build-arg RD_ONLY_GH_TOKEN=$${OAUTH_TOKEN} \
 		. '
 
 test:
@@ -46,6 +49,7 @@ test:
 		--file package/Dockerfile \
 		--target test \
 		--progress=plain \
+		--build-arg RD_ONLY_GH_TOKEN=$${OAUTH_TOKEN} \
 		.
 
 validate:
@@ -54,6 +58,7 @@ validate:
         --file package/Dockerfile \
         --target validate \
         --progress=plain \
+		--build-arg RD_ONLY_GH_TOKEN=$${OAUTH_TOKEN} \
         .
 
 package-helm:
@@ -66,13 +71,14 @@ image: build
 		--file package/Dockerfile \
 		--build-arg VERSION=$${VERSION} \
 		--build-arg COMMIT=$${COMMIT} \
+		--build-arg RD_ONLY_GH_TOKEN=$${OAUTH_TOKEN} \
 		--platform=$(PLATFORM) \
-		-t rancher/webhook:$${TAG} \
+		-t cnrancher/webhook:$${TAG} \
 		--load \
 		. && \
 	mkdir -p dist && \
 	chmod a+rwx dist && \
-	docker save -o dist/rancher-webhook-image.tar rancher/webhook:$${TAG} && \
+	docker save -o dist/rancher-webhook-image.tar cnrancher/webhook:$${TAG} && \
 	echo IMAGE_TAG=$${TAG} > dist/image_tag'
 
 #push-image is used by the publish-image github action

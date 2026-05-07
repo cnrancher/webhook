@@ -7,8 +7,9 @@ on:
 permissions:
   contents: write
 env:
-  REGISTRY: docker.io
-  REPO: rancher
+  REGISTRY: registry.rancher.cn
+  REPO: cnrancher
+  OAUTH_TOKEN: ${{ secrets.RD_ONLY_GH_TOKEN }}
 jobs:
   build:
     name: build and package
@@ -69,12 +70,12 @@ jobs:
           mkdir -p bin/
           cp -v dist/artifacts/webhook-linux-${{ matrix.arch }} bin/webhook
           chmod +x bin/webhook
-      - name: "Read vault secrets"
-        uses: rancher-eio/read-vault-secrets@0da85151ad1f19ed7986c41587e45aac1ace74b6 # v3
-        with:
-          secrets: |
-            secret/data/github/repo/${{ github.repository }}/dockerhub/rancher/credentials username | DOCKER_USERNAME ;
-            secret/data/github/repo/${{ github.repository }}/dockerhub/rancher/credentials password | DOCKER_PASSWORD
+      # - name: "Read vault secrets"
+      #   uses: rancher-eio/read-vault-secrets@0da85151ad1f19ed7986c41587e45aac1ace74b6 # v3
+      #   with:
+      #     secrets: |
+      #       secret/data/github/repo/${{ github.repository }}/dockerhub/rancher/credentials username | DOCKER_USERNAME ;
+      #       secret/data/github/repo/${{ github.repository }}/dockerhub/rancher/credentials password | DOCKER_PASSWORD
       - name: Set up QEMU
         uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3.7.0
       - name: Set up Docker Buildx
@@ -83,8 +84,8 @@ jobs:
         uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
         with:
           registry: ${{ env.REGISTRY }}
-          username: ${{ env.DOCKER_USERNAME }}
-          password: ${{ env.DOCKER_PASSWORD }}
+          username: ${{ secrets.TCR_USERNAME }}
+          password: ${{ secrets.TCR_TOKEN }}
       - name: Set Version/Commit
         run: |
           source ./scripts/version
@@ -96,11 +97,14 @@ jobs:
         with:
           context: .
           file: ./package/Dockerfile
+          secrets: |
+            token=${{ secrets.RD_ONLY_GH_TOKEN }}
           platforms: "linux/${{ matrix.arch }}"
-          outputs: type=image,name=${{ env.REPO }}/rancher-webhook,push-by-digest=true,name-canonical=true,push=true
+          outputs: type=image,name=${{ env.REGISTRY }}/${{ env.REPO }}/rancher-webhook,push-by-digest=true,name-canonical=true,push=true
           build-args: |
             VERSION=${{ env.VERSION }}
             COMMIT=${{ env.COMMIT }}
+            GOPRIVATE=github.com/cnrancher
       - name: Export digest
         run: |
           mkdir -p /tmp/digests
@@ -127,18 +131,18 @@ jobs:
           merge-multiple: true
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
-      - name: "Read vault secrets"
-        uses: rancher-eio/read-vault-secrets@0da85151ad1f19ed7986c41587e45aac1ace74b6 # v3
-        with:
-          secrets: |
-            secret/data/github/repo/${{ github.repository }}/dockerhub/rancher/credentials username | DOCKER_USERNAME ;
-            secret/data/github/repo/${{ github.repository }}/dockerhub/rancher/credentials password | DOCKER_PASSWORD
+      # - name: "Read vault secrets"
+      #   uses: rancher-eio/read-vault-secrets@0da85151ad1f19ed7986c41587e45aac1ace74b6 # v3
+      #   with:
+      #     secrets: |
+      #       secret/data/github/repo/${{ github.repository }}/dockerhub/rancher/credentials username | DOCKER_USERNAME ;
+      #       secret/data/github/repo/${{ github.repository }}/dockerhub/rancher/credentials password | DOCKER_PASSWORD
       - name: Log in to the Container registry
         uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
         with:
           registry: ${{ env.REGISTRY }}
-          username: ${{ env.DOCKER_USERNAME }}
-          password: ${{ env.DOCKER_PASSWORD }}
+          username: ${{ secrets.TCR_USERNAME }}
+          password: ${{ secrets.TCR_TOKEN }}
       - name: Generate tag
         run: |
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
@@ -151,4 +155,4 @@ jobs:
         working-directory: /tmp/digests
         run: |
           docker buildx imagetools create -t ${{ env.REGISTRY }}/${{ env.REPO }}/rancher-webhook:${{ env.TAG }} \
-            $(printf '${{ env.REPO }}/rancher-webhook@sha256:%s ' *)
+            $(printf '${{ env.REGISTRY }}/${{ env.REPO }}/rancher-webhook@sha256:%s ' *)

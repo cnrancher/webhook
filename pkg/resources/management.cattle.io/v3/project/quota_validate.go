@@ -10,6 +10,14 @@ import (
 	quotav1 "k8s.io/apiserver/pkg/quota/v1"
 )
 
+const (
+	// PANDARIA
+	StorageClassPVCQuotaSuffix     = "storageclass.storage.k8s.io/persistentvolumeclaims"
+	StorageClassStorageQuotaSuffix = "storageclass.storage.k8s.io/requests.storage"
+	StorageClassPVCQuotaKey        = "requestsStorageClassPVC"
+	StorageClassStorageQuotaKey    = "requestsStorageClassStorage"
+)
+
 // quotaFits checks whether the quota in the second argument is sufficient for the requested quota in the first argument.
 // If it is not sufficient, a list of the resources that exceed the allotment is returned.
 // The ResourceList to be checked can be compiled by passing a
@@ -72,17 +80,37 @@ func convertLimitToResourceList(limit *mgmtv3.ResourceQuotaLimit) (corev1.Resour
 	// then place the fixed data. this order ensures that in case of
 	// conflicts between arbitrary and fixed data the fixed data wins.
 	for key, value := range converted {
-		var resourceName corev1.ResourceName
-		if val, ok := resourceQuotaConversion[key]; ok {
-			resourceName = corev1.ResourceName(val)
-		} else {
-			resourceName = corev1.ResourceName(key)
+		switch value.(type) {
+		case string:
+			q, err := resource.ParseQuantity(convert.ToString(value))
+			if err != nil {
+				return nil, err
+			}
+			toReturn[corev1.ResourceName(key)] = q
+		case map[string]interface{}:
+			valuemaps := value.(map[string]interface{})
+			for k, v := range valuemaps {
+				valueString, ok := v.(string)
+				if ok {
+					q, err := resource.ParseQuantity(valueString)
+					if err != nil {
+						return nil, err
+					}
+					var rn corev1.ResourceName
+					switch key {
+					case StorageClassStorageQuotaKey:
+						resourceNameStr := fmt.Sprintf("%s.%s", k, StorageClassStorageQuotaSuffix)
+						rn = corev1.ResourceName(resourceNameStr)
+					case StorageClassPVCQuotaKey:
+						resourceNameStr := fmt.Sprintf("%s.%s", k, StorageClassPVCQuotaSuffix)
+						rn = corev1.ResourceName(resourceNameStr)
+					default:
+						rn = corev1.ResourceName(key)
+					}
+					toReturn[rn] = q
+				}
+			}
 		}
-		resourceQuantity, err := resource.ParseQuantity(convert.ToString(value))
-		if err != nil {
-			return nil, fmt.Errorf("parsing quantity %q: %w", key, err)
-		}
-		toReturn[resourceName] = resourceQuantity
 	}
 	return toReturn, nil
 }
