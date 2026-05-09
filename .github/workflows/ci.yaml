@@ -30,41 +30,32 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - org-cnrancher-runner-dind-x64
-          - org-cnrancher-runner-dind-arm64
+          - ubuntu-latest
+          - ubuntu-24.04-arm
     runs-on: ${{ matrix.os }}
     steps:
       - name : Checkout repository
         # https://github.com/actions/checkout/releases/tag/v4.1.1
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
 
-      - name: Setup Go
-        # https://github.com/actions/setup-go/releases/tag/v5.0.0
-        uses: actions/setup-go@44694675825211faa026b3c33043df3e48a5fa00 # v6.0.0
-        with:
-          go-version-file: 'go.mod'
-      - name: Install golangci-lint
-        uses: golangci/golangci-lint-action@55c2c1448f86e01eaae002a5a3a9624417608d84 # v6.5.2
-        with:
-          version: v1.64.8
 
       - name: Set arch variable
         shell: bash
         run: |
           case "${{ runner.arch }}" in
           "X64" )
-            echo "ARCH=amd64" >> $GITHUB_ENV
+            echo "PLATFORM_ARCH=amd64" >> $GITHUB_ENV
             ;;
           "ARM64" )
-            echo "ARCH=arm64" >> $GITHUB_ENV
+            echo "PLATFORM_ARCH=arm64" >> $GITHUB_ENV
             ;;
           esac
 
       - name: Install dependencies
         shell: bash
         run: |
-          curl -sL https://get.helm.sh/helm-v3.13.3-linux-${ARCH}.tar.gz | sudo tar xvzf - -C /usr/local/bin --strip-components=1
-          curl -sL https://dl.k8s.io/v1.28.11/kubernetes-client-linux-${ARCH}.tar.gz | sudo tar xvzf - -C /usr/local/bin --strip-components=3
+          curl -sL https://get.helm.sh/helm-v3.13.3-linux-${PLATFORM_ARCH}.tar.gz | sudo tar xvzf - -C /usr/local/bin --strip-components=1
+          curl -sL https://dl.k8s.io/v1.28.11/kubernetes-client-linux-${PLATFORM_ARCH}.tar.gz | sudo tar xvzf - -C /usr/local/bin --strip-components=3
 
       # TODO: Pull this next one out once there's a helm-release for rancher 2.9
       - name: Checkout rancher/rancher and build the chart
@@ -77,25 +68,20 @@ jobs:
           tar cfz "${{ runner.temp }}/rancher.tgz" -C build/chart/rancher .
           popd
 
-      - name: install K3d
-        run: ./.github/workflows/scripts/install-k3d.sh
-        env:
-          K3D_VERSION: latest
-      
-      - name: "PANDARIA: install make"
-        run: |
-          sudo apt update
-          sudo apt install -y build-essential
-
-      - name: ci
+      - name: Build, Test, and Package
         run: make ci
+
+      - name: install K3d
+        run: |
+          ./.github/workflows/scripts/install-k3d.sh
+          sudo mv ./bin/k3d /usr/local/bin/k3d
 
       - name: setup cluster
         run: ./.github/workflows/scripts/setup-cluster.sh
         env:
           CLUSTER_NAME: webhook
           K3S_VERSION: v1.28.9-k3s1
-          ARCH: "${{ matrix.archBox.arch }}"
+          ARCH: "${PLATFORM_ARCH}"
 
       - name: import image
         run: k3d image import dist/rancher-webhook-image.tar -c webhook
@@ -113,7 +99,7 @@ jobs:
       - name: Run integration tests
         run: ./.github/workflows/scripts/integration-test-ci
         env:
-          ARCH: "${ARCH}"
+          ARCH: "${PLATFORM_ARCH}"
           CLUSTER_NAME: webhook
           IMAGE_REPO: cnrancher/webhook
           IMAGE_TAG: "${{ env.IMAGE_TAG }}"

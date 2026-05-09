@@ -2,34 +2,34 @@ module github.com/rancher/webhook
 
 go 1.24.0
 
-toolchain go1.24.2
+toolchain go1.24.13
 
 replace (
-	github.com/rancher/rancher/pkg/apis => github.com/cnrancher/pandaria/pkg/apis v0.0.0-20260303063241-bb242ede8aac
-	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.34.1
-	k8s.io/cli-runtime => k8s.io/cli-runtime v0.34.1
-	k8s.io/client-go => k8s.io/client-go v0.34.1
-	k8s.io/cloud-provider => k8s.io/cloud-provider v0.34.1
-	k8s.io/cluster-bootstrap => k8s.io/cluster-bootstrap v0.34.1
-	k8s.io/code-generator => k8s.io/code-generator v0.34.1
-	k8s.io/component-helpers => k8s.io/component-helpers v0.34.1
-	k8s.io/controller-manager => k8s.io/controller-manager v0.34.1
-	k8s.io/cri-api => k8s.io/cri-api v0.34.1
-	k8s.io/cri-client => k8s.io/cri-client v0.34.1
-	k8s.io/csi-translation-lib => k8s.io/csi-translation-lib v0.34.1
-	k8s.io/dynamic-resource-allocation => k8s.io/dynamic-resource-allocation v0.34.1
-	k8s.io/endpointslice => k8s.io/endpointslice v0.34.1
-	k8s.io/externaljwt => k8s.io/externaljwt v0.34.1
-	k8s.io/kube-aggregator => k8s.io/kube-aggregator v0.34.1
-	k8s.io/kube-controller-manager => k8s.io/kube-controller-manager v0.34.1
-	k8s.io/kube-proxy => k8s.io/kube-proxy v0.34.1
-	k8s.io/kube-scheduler => k8s.io/kube-scheduler v0.34.1
-	k8s.io/kubectl => k8s.io/kubectl v0.34.1
-	k8s.io/kubelet => k8s.io/kubelet v0.34.1
+	github.com/rancher/rancher/pkg/apis => github.com/cnrancher/pandaria/pkg/apis v0.0.0-20260508072947-59888e4f39ee
+	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.34.5
+	k8s.io/cli-runtime => k8s.io/cli-runtime v0.34.5
+	k8s.io/client-go => k8s.io/client-go v0.34.5
+	k8s.io/cloud-provider => k8s.io/cloud-provider v0.34.5
+	k8s.io/cluster-bootstrap => k8s.io/cluster-bootstrap v0.34.5
+	k8s.io/code-generator => k8s.io/code-generator v0.34.5
+	k8s.io/component-helpers => k8s.io/component-helpers v0.34.5
+	k8s.io/controller-manager => k8s.io/controller-manager v0.34.5
+	k8s.io/cri-api => k8s.io/cri-api v0.34.5
+	k8s.io/cri-client => k8s.io/cri-client v0.34.5
+	k8s.io/csi-translation-lib => k8s.io/csi-translation-lib v0.34.5
+	k8s.io/dynamic-resource-allocation => k8s.io/dynamic-resource-allocation v0.34.5
+	k8s.io/endpointslice => k8s.io/endpointslice v0.34.5
+	k8s.io/externaljwt => k8s.io/externaljwt v0.34.5
+	k8s.io/kube-aggregator => k8s.io/kube-aggregator v0.34.5
+	k8s.io/kube-controller-manager => k8s.io/kube-controller-manager v0.34.5
+	k8s.io/kube-proxy => k8s.io/kube-proxy v0.34.5
+	k8s.io/kube-scheduler => k8s.io/kube-scheduler v0.34.5
+	k8s.io/kubectl => k8s.io/kubectl v0.34.5
+	k8s.io/kubelet => k8s.io/kubelet v0.34.5
 	k8s.io/legacy-cloud-providers => k8s.io/legacy-cloud-providers v0.34.1
-	k8s.io/metrics => k8s.io/metrics v0.34.1
-	k8s.io/mount-utils => k8s.io/mount-utils v0.34.1
-	k8s.io/sample-apiserver => k8s.io/sample-apiserver v0.34.1
+	k8s.io/metrics => k8s.io/metrics v0.34.5
+	k8s.io/mount-utils => k8s.io/mount-utils v0.34.5
+	k8s.io/sample-apiserver => k8s.io/sample-apiserver v0.34.5
 )
 
 require (
@@ -42,28 +42,28 @@ require (
 	github.com/rancher/lasso v0.2.5
 	github.com/rancher/rancher/pkg/apis v0.0.0-20260115212751-7e496edc167e
 	github.com/rancher/rke v1.8.6
-	github.com/rancher/wrangler/v3 v3.3.4
+	github.com/rancher/wrangler/v3 v3.3.5
 	github.com/robfig/cron v1.2.0
 	github.com/sirupsen/logrus v1.9.4
 	github.com/stretchr/testify v1.11.1
 	go.uber.org/mock v0.6.0
 	golang.org/x/text v0.33.0
 	golang.org/x/tools v0.41.0
-	k8s.io/api v0.34.3
-	k8s.io/apimachinery v0.34.3
-	k8s.io/apiserver v0.34.3
+	k8s.io/api v0.34.6
+	k8s.io/apimachinery v0.34.6
+	k8s.io/apiserver v0.34.6
 	k8s.io/client-go v12.0.0+incompatible
-	k8s.io/kubernetes v1.34.3
-	k8s.io/pod-security-admission v0.34.1
+	k8s.io/kubernetes v1.34.6
+	k8s.io/pod-security-admission v0.34.5
 	k8s.io/utils v0.0.0-20251002143259-bc988d571ff4
-	sigs.k8s.io/controller-runtime v0.22.4
+	sigs.k8s.io/controller-runtime v0.22.5
 	sigs.k8s.io/yaml v1.6.0
 )
 
 require (
 	github.com/cnrancher/ack-operator v0.0.5-0.20251212112227-32dedfec5f04 // indirect
 	github.com/cnrancher/cce-operator v0.9.0-beta.3 // indirect
-	github.com/cnrancher/tke-operator v0.0.0-20250902073259-2ccb095bb3f5 // indirect
+	github.com/cnrancher/tke-operator v0.0.0-20260423050859-75a74b8f069b // indirect
 )
 
 require (
@@ -98,11 +98,11 @@ require (
 	github.com/prometheus/client_model v0.6.1 // indirect
 	github.com/prometheus/common v0.62.0 // indirect
 	github.com/prometheus/procfs v0.15.1 // indirect
-	github.com/rancher/aks-operator v1.13.3 // indirect
+	github.com/rancher/aks-operator v1.13.5 // indirect
 	github.com/rancher/ali-operator v1.13.2 // indirect
-	github.com/rancher/eks-operator v1.13.3 // indirect
+	github.com/rancher/eks-operator v1.13.5 // indirect
 	github.com/rancher/fleet/pkg/apis v0.14.2 // indirect
-	github.com/rancher/gke-operator v1.13.3 // indirect
+	github.com/rancher/gke-operator v1.13.5 // indirect
 	//TODO: Replace with a tag during un-rc'ing
 	github.com/rancher/norman v0.7.2 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
@@ -114,7 +114,7 @@ require (
 	golang.org/x/crypto v0.47.0 // indirect
 	golang.org/x/mod v0.32.0 // indirect
 	golang.org/x/net v0.49.0 // indirect
-	golang.org/x/oauth2 v0.34.0 // indirect
+	golang.org/x/oauth2 v0.35.0 // indirect
 	golang.org/x/sync v0.19.0 // indirect
 	golang.org/x/sys v0.40.0 // indirect
 	golang.org/x/term v0.39.0 // indirect
@@ -125,9 +125,9 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/apiextensions-apiserver v0.34.3 // indirect
-	k8s.io/code-generator v0.34.1 // indirect
-	k8s.io/component-base v0.34.3 // indirect
+	k8s.io/apiextensions-apiserver v0.34.6 // indirect
+	k8s.io/code-generator v0.34.5 // indirect
+	k8s.io/component-base v0.34.6 // indirect
 	k8s.io/component-helpers v0.34.1 // indirect
 	k8s.io/controller-manager v0.34.1 // indirect
 	k8s.io/gengo v0.0.0-20250130153323-76c5745d3511 // indirect
