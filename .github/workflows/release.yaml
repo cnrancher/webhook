@@ -91,47 +91,115 @@ jobs:
         cd dist/artifacts
         gh --repo "${{ github.repository }}" release create ${{ github.ref_name }} --prerelease --verify-tag --generate-notes webhook-linux-* sha256sum-*.txt rancher-webhook*.tgz
       env:
-        GITHUB_TOKEN: ${{ secrets.RD_ONLY_GH_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  publish:
-    runs-on: ubuntu-latest
+  image:
     permissions:
       contents: read
-      id-token: write # Required for cosign signing
+      id-token: write
+    strategy:
+      matrix:
+        arch:
+        - amd64
+        - arm64
+    name: Build and push Webhook images
+    runs-on: ubuntu-latest
+    needs: build
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
-
-      # - name: "Read vault secrets"
-      #   uses: rancher-eio/read-vault-secrets@0da85151ad1f19ed7986c41587e45aac1ace74b6 # v3
-      #   with:
-      #     secrets: |
-      #       secret/data/github/repo/${{ github.repository }}/dockerhub/rancher/credentials username | DOCKER_USERNAME ;
-      #       secret/data/github/repo/${{ github.repository }}/dockerhub/rancher/credentials password | DOCKER_PASSWORD ;
-      #       secret/data/github/repo/${{ github.repository }}/rancher-prime-stg-registry/credentials registry | PRIME_STG_REGISTRY ;
-      #       secret/data/github/repo/${{ github.repository }}/rancher-prime-stg-registry/credentials username | PRIME_STG_REGISTRY_USERNAME ;
-      #       secret/data/github/repo/${{ github.repository }}/rancher-prime-stg-registry/credentials password | PRIME_STG_REGISTRY_PASSWORD
-
-      - name: Publish image
-        uses: rancher/ecm-distro-tools/actions/publish-image@575bb831c67edd950bfedb59d41dd127bd0005d6 # v0.65.2
+      - name : Checkout repository
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+      - name: Download the artifacts
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
-          image: rancher-webhook
-          tag: ${{ github.ref_name }}
-          platforms: linux/amd64,linux/arm64
+          name: webhook-artifacts-${{ matrix.arch }}
+          path: dist/artifacts
+      - name: Move binary to bin/
+        run: |
+          mkdir -p bin/
+          cp -v dist/artifacts/webhook-linux-${{ matrix.arch }} bin/webhook
+          chmod +x bin/webhook
 
-          public-registry: ${{ env.REGISTRY }}
-          public-repo: ${{ env.REPO }}
-          public-username: ${{ secrets.TCR_USERNAME }}
-          public-password: ${{ secrets.TCR_TOKEN }}
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3.7.0
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
+      - name: Log in to the Container registry
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.TCR_USERNAME }}
+          password: ${{ secrets.TCR_TOKEN }}
 
-          push-to-prime: false
+      - name: Set Version/Commit
+        run: |
+          source ./scripts/version
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          echo "COMMIT=${COMMIT}" >> $GITHUB_ENV
+
+      - name: Build and push the webhook image
+        id: build
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
+        with:
+          context: .
+          file: ./package/Dockerfile
+          secrets: |
+            token=${{ secrets.RD_ONLY_GH_TOKEN }}
+          platforms: "linux/${{ matrix.arch }}"
+          outputs: type=image,name=${{ env.REGISTRY }}/${{ env.REPO }}/rancher-webhook,push-by-digest=true,name-canonical=true,push=true
+          build-args: |
+            VERSION=${{ env.VERSION }}
+            COMMIT=${{ env.COMMIT }}
+            GOPRIVATE=github.com/cnrancher
+
+      - name: Export digest
+        run: |
+          mkdir -p /tmp/digests
+          digest="${{ steps.build.outputs.digest }}"
+          touch "/tmp/digests/${digest#sha256:}"
+      - name: Upload digest
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: digests-${{ matrix.arch }}
+          path: /tmp/digests/*
+          if-no-files-found: error
+          retention-days: 1
+  merge:
+    permissions:
+      id-token: write
+    runs-on: ubuntu-latest
+    needs: image
+    steps:
+      - name: Download digests
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          path: /tmp/digests
+          pattern: digests-*
+          merge-multiple: true
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.TCR_USERNAME }}
+          password: ${{ secrets.TCR_TOKEN }}
+      - if: ${{ startsWith(github.ref, 'refs/tags/') }}
+        run: |
+          echo TAG_NAME=$(echo $GITHUB_REF | sed -e "s|refs/tags/||") >> $GITHUB_ENV
+
+      - name: Create manifest list and push
+        working-directory: /tmp/digests
+        run: |
+          docker buildx imagetools create -t ${{ env.REGISTRY }}/${{ env.REPO }}/rancher-webhook:${{ env.TAG_NAME }} \
+            $(printf '${{ env.REGISTRY }}/${{ env.REPO }}/rancher-webhook@sha256:%s ' *)
 
   image-sign:
     permissions:
       contents: read
       id-token: write # required for hangar sign OIDC keyless mode
     runs-on: ubuntu-latest
-    needs: [ publish ]
+    needs: [ merge ]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
