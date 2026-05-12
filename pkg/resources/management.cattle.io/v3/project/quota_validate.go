@@ -51,6 +51,13 @@ var (
 	}
 )
 
+func convertResourceQuotaKey(key string) corev1.ResourceName {
+	if converted, ok := resourceQuotaConversion[key]; ok {
+		return corev1.ResourceName(converted)
+	}
+	return corev1.ResourceName(key)
+}
+
 // convertLimitToResourceList converts a management.cattle.io/v3 ResourceQuotaLimit object to a core/v1 ResourceList,
 // which can then be used to compare quotas.
 func convertLimitToResourceList(limit *mgmtv3.ResourceQuotaLimit) (corev1.ResourceList, error) {
@@ -86,7 +93,7 @@ func convertLimitToResourceList(limit *mgmtv3.ResourceQuotaLimit) (corev1.Resour
 			if err != nil {
 				return nil, err
 			}
-			toReturn[corev1.ResourceName(key)] = q
+			toReturn[convertResourceQuotaKey(key)] = q
 		case map[string]interface{}:
 			valuemaps := value.(map[string]interface{})
 			for k, v := range valuemaps {
@@ -105,7 +112,7 @@ func convertLimitToResourceList(limit *mgmtv3.ResourceQuotaLimit) (corev1.Resour
 						resourceNameStr := fmt.Sprintf("%s.%s", k, StorageClassPVCQuotaSuffix)
 						rn = corev1.ResourceName(resourceNameStr)
 					default:
-						rn = corev1.ResourceName(key)
+						rn = convertResourceQuotaKey(key)
 					}
 					toReturn[rn] = q
 				}
