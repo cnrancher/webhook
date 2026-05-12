@@ -29,13 +29,7 @@ jobs:
       uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
       # https://github.com/actions/checkout/releases/tag/v4.1.1
 
-    - name: Setup Go
-      uses: actions/setup-go@d35c59abb061a4a6fb18e82ac0862c26744d6ab5 # v5.5.0
-      # https://github.com/actions/setup-go/releases/tag/v5.0.0
-      with:
-        go-version-file: 'go.mod'
-
-    - name: Build and package
+    - name: Build Binary
       run: |
           ./scripts/build
           mkdir -p dist/artifacts
@@ -44,9 +38,10 @@ jobs:
         ARCH: "${{ matrix.arch}}"
         GOARCH: "${{ matrix.arch}}"
 
-    - name: Generate checksum files
+    - name: Prepare Artifacts
       run: |
-        ls -lR dist
+        mkdir -p dist/artifacts
+        cp bin/webhook dist/artifacts/webhook-linux-${{ matrix.arch }}
         cd dist/artifacts
         sha256sum webhook-linux-${{ matrix.arch }} > sha256sum-${{ matrix.arch }}.txt
 
@@ -70,7 +65,7 @@ jobs:
       uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
 
     - name: package-helm
-      run: ./scripts/package-helm
+      run: make package-helm
 
     - name: Download the amd64 artifacts
       uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
@@ -113,71 +108,62 @@ jobs:
     needs: build
     steps:
       - name : Checkout repository
-        # https://github.com/actions/checkout/releases/tag/v4.1.1
-        uses: actions/checkout@08eba0b27e820071cde6df949e0beb9ba4906955 # v4.3.0
-
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
       - name: Download the artifacts
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-        # https://github.com/actions/download-artifact/releases/tag/v4.1.7
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: webhook-artifacts-${{ matrix.arch }}
           path: dist/artifacts
-
       - name: Move binary to bin/
         run: |
           mkdir -p bin/
           cp -v dist/artifacts/webhook-linux-${{ matrix.arch }} bin/webhook
           chmod +x bin/webhook
 
-# PANDARIA
-#      - name: "Read vault secrets"
-#        uses: rancher-eio/read-vault-secrets@main
-#        with:
-#          secrets: |
-#            secret/data/github/repo/${{ github.repository }}/dockerhub/rancher/credentials username | DOCKER_USERNAME ;
-#            secret/data/github/repo/${{ github.repository }}/dockerhub/rancher/credentials password | DOCKER_PASSWORD
-
       - name: Set up QEMU
-        # https://github.com/docker/setup-qemu-action/releases/tag/v3.1.0
-        uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392 # v3.6.0
-
+        uses: docker/setup-qemu-action@c7c53464625b32c7a7e944ae62b3e17d2b600130 # v3.7.0
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
-        # https://github.com/docker/setup-buildx-action/releases/tag/v3.4.0
-
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
       - name: Log in to the Container registry
-        # https://github.com/docker/login-action/releases/tag/v3.2.0
-        uses: docker/login-action@184bdaa0721073962dff0199f1fb9940f07167d1 # v3.5.0
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ secrets.TCR_USERNAME }}
           password: ${{ secrets.TCR_TOKEN }}
 
+      - name: Set Version/Commit
+        run: |
+          source ./scripts/version
+          echo "VERSION=${VERSION}" >> $GITHUB_ENV
+          echo "COMMIT=${COMMIT}" >> $GITHUB_ENV
+
       - name: Build and push the webhook image
         id: build
-        # https://github.com/docker/build-push-action/releases/tag/v6.3.0
-        uses: docker/build-push-action@263435318d21b8e681c14492fe198d362a7d2c83 # v6.18.0
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
         with:
           context: .
           file: ./package/Dockerfile
+          secrets: |
+            token=${{ secrets.RD_ONLY_GH_TOKEN }}
           platforms: "linux/${{ matrix.arch }}"
           outputs: type=image,name=${{ env.REGISTRY }}/${{ env.REPO }}/rancher-webhook,push-by-digest=true,name-canonical=true,push=true
+          build-args: |
+            VERSION=${{ env.VERSION }}
+            COMMIT=${{ env.COMMIT }}
+            GOPRIVATE=github.com/cnrancher
 
       - name: Export digest
         run: |
           mkdir -p /tmp/digests
           digest="${{ steps.build.outputs.digest }}"
           touch "/tmp/digests/${digest#sha256:}"
-
       - name: Upload digest
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        # https://github.com/actions/upload-artifact/releases/tag/v4.3.3
         with:
           name: digests-${{ matrix.arch }}
           path: /tmp/digests/*
           if-no-files-found: error
           retention-days: 1
-
   merge:
     permissions:
       id-token: write
@@ -185,34 +171,20 @@ jobs:
     needs: image
     steps:
       - name: Download digests
-        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
-        # https://github.com/actions/download-artifact/releases/tag/v4.1.7
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           path: /tmp/digests
           pattern: digests-*
           merge-multiple: true
-
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@e468171a9de216ec08956ac3ada2f0791b6bd435 # v3.11.1
-        # https://github.com/docker/setup-buildx-action/releases/tag/v3.4.0
-
-# PANDARIA
-#      - name: "Read vault secrets"
-#        uses: rancher-eio/read-vault-secrets@main
-#        with:
-#          secrets: |
-#            secret/data/github/repo/${{ github.repository }}/dockerhub/rancher/credentials username | DOCKER_USERNAME ;
-#            secret/data/github/repo/${{ github.repository }}/dockerhub/rancher/credentials password | DOCKER_PASSWORD
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
 
       - name: Log in to the Container registry
-        uses: docker/login-action@184bdaa0721073962dff0199f1fb9940f07167d1 # v3.5.0
-        # https://github.com/docker/login-action/releases/tag/v3.2.0
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ secrets.TCR_USERNAME }}
           password: ${{ secrets.TCR_TOKEN }}
-
-        # setup tag name
       - if: ${{ startsWith(github.ref, 'refs/tags/') }}
         run: |
           echo TAG_NAME=$(echo $GITHUB_REF | sed -e "s|refs/tags/||") >> $GITHUB_ENV
@@ -222,6 +194,7 @@ jobs:
         run: |
           docker buildx imagetools create -t ${{ env.REGISTRY }}/${{ env.REPO }}/rancher-webhook:${{ env.TAG_NAME }} \
             $(printf '${{ env.REGISTRY }}/${{ env.REPO }}/rancher-webhook@sha256:%s ' *)
+
   image-sign:
     permissions:
       contents: read
