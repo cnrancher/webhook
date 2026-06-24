@@ -5,7 +5,7 @@ go 1.24.0
 toolchain go1.24.13
 
 replace (
-	github.com/rancher/rancher/pkg/apis => github.com/cnrancher/pandaria/pkg/apis v0.0.0-20260508072947-59888e4f39ee
+	github.com/rancher/rancher/pkg/apis => github.com/cnrancher/pandaria/pkg/apis v0.0.0-20260623073548-7f5300f26f64
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.34.5
 	k8s.io/cli-runtime => k8s.io/cli-runtime v0.34.5
 	k8s.io/client-go => k8s.io/client-go v0.34.5
@@ -37,10 +37,10 @@ require (
 	github.com/evanphx/json-patch v5.9.11+incompatible
 	github.com/go-ldap/ldap/v3 v3.4.11
 	github.com/gorilla/mux v1.8.1
-	github.com/rancher/dynamiclistener v0.7.5
+	github.com/rancher/dynamiclistener v0.7.6
 	github.com/rancher/jsonpath v0.0.0-20250620213443-ad24535cf0c1
 	github.com/rancher/lasso v0.2.5
-	github.com/rancher/rancher/pkg/apis v0.0.0-20260115212751-7e496edc167e
+	github.com/rancher/rancher/pkg/apis v0.0.0-20260522185806-e8985c7363af
 	github.com/rancher/rke v1.8.6
 	github.com/rancher/wrangler/v3 v3.3.5
 	github.com/robfig/cron v1.2.0
@@ -49,8 +49,8 @@ require (
 	go.uber.org/mock v0.6.0
 	golang.org/x/text v0.33.0
 	golang.org/x/tools v0.41.0
-	k8s.io/api v0.34.6
-	k8s.io/apimachinery v0.34.6
+	k8s.io/api v0.34.8
+	k8s.io/apimachinery v0.34.8
 	k8s.io/apiserver v0.34.6
 	k8s.io/client-go v12.0.0+incompatible
 	k8s.io/kubernetes v1.34.6
@@ -98,13 +98,13 @@ require (
 	github.com/prometheus/client_model v0.6.1 // indirect
 	github.com/prometheus/common v0.62.0 // indirect
 	github.com/prometheus/procfs v0.15.1 // indirect
-	github.com/rancher/aks-operator v1.13.5 // indirect
-	github.com/rancher/ali-operator v1.13.2 // indirect
-	github.com/rancher/eks-operator v1.13.5 // indirect
-	github.com/rancher/fleet/pkg/apis v0.14.2 // indirect
-	github.com/rancher/gke-operator v1.13.5 // indirect
+	github.com/rancher/aks-operator v1.13.6 // indirect
+	github.com/rancher/ali-operator v1.13.3 // indirect
+	github.com/rancher/eks-operator v1.13.6 // indirect
+	github.com/rancher/fleet/pkg/apis v0.14.6 // indirect
+	github.com/rancher/gke-operator v1.13.6 // indirect
 	//TODO: Replace with a tag during un-rc'ing
-	github.com/rancher/norman v0.7.2 // indirect
+	github.com/rancher/norman v0.7.3 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	go.opentelemetry.io/otel v1.39.0 // indirect
