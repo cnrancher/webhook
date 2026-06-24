@@ -30,8 +30,8 @@ jobs:
       fail-fast: false
       matrix:
         os:
-          - ubuntu-latest
-          - ubuntu-24.04-arm
+          - org-cnrancher-runner-dind-x64
+          - org-cnrancher-runner-dind-arm64
     runs-on: ${{ matrix.os }}
     steps:
       - name : Checkout repository
@@ -67,6 +67,11 @@ jobs:
           ./scripts/chart/build chart
           tar cfz "${{ runner.temp }}/rancher.tgz" -C build/chart/rancher .
           popd
+
+      - name: "PANDARIA: install make"
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential
 
       - name: Build, Test, and Package
         run: make ci

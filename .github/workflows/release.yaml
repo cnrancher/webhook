@@ -1,9 +1,13 @@
-name: On release
+name: release
 
 on:
+  push:
+    tags:
+      - v*
   workflow_dispatch:
 
-permissions: {}
+permissions:
+  contents: write
 
 env:
   REGISTRY: registry.rancher.cn
