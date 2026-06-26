@@ -73,12 +73,12 @@ image: build
 		--build-arg COMMIT=$${COMMIT} \
 		--build-arg RD_ONLY_GH_TOKEN=$${OAUTH_TOKEN} \
 		--platform=$(PLATFORM) \
-		-t rancher/webhook:$${TAG} \
+		-t cnrancher/webhook:$${TAG} \
 		--load \
 		. && \
 	mkdir -p dist && \
 	chmod a+rwx dist && \
-	docker save -o dist/rancher-webhook-image.tar rancher/webhook:$${TAG} && \
+	docker save -o dist/rancher-webhook-image.tar cnrancher/webhook:$${TAG} && \
 	echo IMAGE_TAG=$${TAG} > dist/image_tag'
 
 #push-image is used by the publish-image github action
