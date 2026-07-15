@@ -1,11 +1,9 @@
 module github.com/rancher/webhook
 
-go 1.25.0
-
-toolchain go1.25.10
+go 1.25.11
 
 replace (
-	github.com/rancher/rancher/pkg/apis => github.com/cnrancher/pandaria/pkg/apis v0.0.0-20260624041651-ad532bbad90b
+	github.com/rancher/rancher/pkg/apis => github.com/cnrancher/pandaria/pkg/apis v0.0.0-20260714073448-8f983275e129
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.35.3
 	k8s.io/cli-runtime => k8s.io/cli-runtime v0.35.3
 	k8s.io/client-go => k8s.io/client-go v0.35.3
@@ -41,20 +39,20 @@ require (
 	github.com/rancher/dynamiclistener v0.8.2
 	github.com/rancher/jsonpath v0.0.0-20250620213443-ad24535cf0c1
 	github.com/rancher/lasso v0.2.8
-	github.com/rancher/rancher/pkg/apis v0.0.0-20260522185914-1a2e2ce61faf
+	github.com/rancher/rancher/pkg/apis v0.0.0-20260619152252-701486fac020
 	github.com/rancher/rke v1.8.6
 	github.com/rancher/wrangler/v3 v3.6.0
 	github.com/robfig/cron v1.2.0
 	github.com/sirupsen/logrus v1.9.4
 	github.com/stretchr/testify v1.11.1
 	go.uber.org/mock v0.6.0
-	golang.org/x/text v0.37.0
-	golang.org/x/tools v0.44.0
-	k8s.io/api v0.35.4
-	k8s.io/apimachinery v0.35.4
-	k8s.io/apiserver v0.35.4
+	golang.org/x/text v0.38.0
+	golang.org/x/tools v0.45.0
+	k8s.io/api v0.35.6
+	k8s.io/apimachinery v0.35.6
+	k8s.io/apiserver v0.35.6
 	k8s.io/client-go v12.0.0+incompatible
-	k8s.io/kubernetes v1.35.3
+	k8s.io/kubernetes v1.35.6
 	k8s.io/pod-security-admission v0.35.3
 	k8s.io/utils v0.0.0-20260108192941-914a6e750570
 	sigs.k8s.io/controller-runtime v0.23.3
@@ -80,7 +78,7 @@ require (
 )
 
 require (
-	github.com/Azure/go-ntlmssp v0.0.0-20221128193559-754e69321358 // indirect
+	github.com/Azure/go-ntlmssp v0.1.1 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/blang/semver/v4 v4.0.0 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
@@ -107,12 +105,12 @@ require (
 	github.com/prometheus/client_model v0.6.2 // indirect
 	github.com/prometheus/common v0.67.5 // indirect
 	github.com/prometheus/procfs v0.19.2 // indirect
-	github.com/rancher/aks-operator v1.14.2 // indirect
-	github.com/rancher/ali-operator v1.14.1 // indirect
-	github.com/rancher/eks-operator v1.14.2 // indirect
-	github.com/rancher/fleet/pkg/apis v0.15.2 // indirect
-	github.com/rancher/gke-operator v1.14.2 // indirect
-	github.com/rancher/norman v0.8.7
+	github.com/rancher/aks-operator v1.14.3 // indirect
+	github.com/rancher/ali-operator v1.14.2 // indirect
+	github.com/rancher/eks-operator v1.14.3 // indirect
+	github.com/rancher/fleet/pkg/apis v0.15.4 // indirect
+	github.com/rancher/gke-operator v1.14.3 // indirect
+	github.com/rancher/norman v0.8.8
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
@@ -120,13 +118,13 @@ require (
 	go.opentelemetry.io/otel/trace v1.43.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.3 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
-	golang.org/x/crypto v0.51.0 // indirect
-	golang.org/x/mod v0.35.0 // indirect
-	golang.org/x/net v0.54.0
+	golang.org/x/crypto v0.53.0 // indirect
+	golang.org/x/mod v0.36.0 // indirect
+	golang.org/x/net v0.56.0
 	golang.org/x/oauth2 v0.36.0 // indirect
-	golang.org/x/sync v0.20.0 // indirect
-	golang.org/x/sys v0.44.0 // indirect
-	golang.org/x/term v0.43.0 // indirect
+	golang.org/x/sync v0.21.0 // indirect
+	golang.org/x/sys v0.46.0 // indirect
+	golang.org/x/term v0.44.0 // indirect
 	golang.org/x/time v0.15.0 // indirect
 	gomodules.xyz/jsonpatch/v2 v2.5.0 // indirect
 	google.golang.org/protobuf v1.36.11 // indirect
@@ -134,9 +132,9 @@ require (
 	gopkg.in/inf.v0 v0.9.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/apiextensions-apiserver v0.35.1 // indirect
+	k8s.io/apiextensions-apiserver v0.35.6 // indirect
 	k8s.io/code-generator v0.35.3 // indirect
-	k8s.io/component-base v0.35.4 // indirect
+	k8s.io/component-base v0.35.6 // indirect
 	k8s.io/component-helpers v0.35.0 // indirect
 	k8s.io/controller-manager v0.35.0 // indirect
 	k8s.io/gengo v0.0.0-20250130153323-76c5745d3511 // indirect
