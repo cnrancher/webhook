@@ -3,7 +3,7 @@ module github.com/rancher/webhook
 go 1.25.11
 
 replace (
-	github.com/rancher/rancher/pkg/apis => github.com/cnrancher/pandaria/pkg/apis v0.0.0-20260714073448-8f983275e129
+	github.com/rancher/rancher/pkg/apis => github.com/cnrancher/pandaria/pkg/apis v0.0.0-20260807042406-be7635e409bd
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.35.3
 	k8s.io/cli-runtime => k8s.io/cli-runtime v0.35.3
 	k8s.io/client-go => k8s.io/client-go v0.35.3
@@ -36,18 +36,18 @@ require (
 	github.com/go-ldap/ldap/v3 v3.4.11
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/mux v1.8.1
-	github.com/rancher/dynamiclistener v0.8.2
+	github.com/rancher/dynamiclistener v0.8.3
 	github.com/rancher/jsonpath v0.0.0-20250620213443-ad24535cf0c1
 	github.com/rancher/lasso v0.2.8
-	github.com/rancher/rancher/pkg/apis v0.0.0-20260619152252-701486fac020
+	github.com/rancher/rancher/pkg/apis v0.0.0-20260717210315-e29d94341153
 	github.com/rancher/rke v1.8.6
 	github.com/rancher/wrangler/v3 v3.6.0
 	github.com/robfig/cron v1.2.0
 	github.com/sirupsen/logrus v1.9.4
 	github.com/stretchr/testify v1.11.1
 	go.uber.org/mock v0.6.0
-	golang.org/x/text v0.38.0
-	golang.org/x/tools v0.45.0
+	golang.org/x/text v0.39.0
+	golang.org/x/tools v0.47.0
 	k8s.io/api v0.35.6
 	k8s.io/apimachinery v0.35.6
 	k8s.io/apiserver v0.35.6
@@ -105,11 +105,11 @@ require (
 	github.com/prometheus/client_model v0.6.2 // indirect
 	github.com/prometheus/common v0.67.5 // indirect
 	github.com/prometheus/procfs v0.19.2 // indirect
-	github.com/rancher/aks-operator v1.14.3 // indirect
-	github.com/rancher/ali-operator v1.14.2 // indirect
-	github.com/rancher/eks-operator v1.14.3 // indirect
-	github.com/rancher/fleet/pkg/apis v0.15.4 // indirect
-	github.com/rancher/gke-operator v1.14.3 // indirect
+	github.com/rancher/aks-operator v1.14.4 // indirect
+	github.com/rancher/ali-operator v1.14.3 // indirect
+	github.com/rancher/eks-operator v1.14.4 // indirect
+	github.com/rancher/fleet/pkg/apis v0.15.5 // indirect
+	github.com/rancher/gke-operator v1.14.4 // indirect
 	github.com/rancher/norman v0.8.8
 	github.com/robfig/cron/v3 v3.0.1 // indirect
 	github.com/spf13/pflag v1.0.10 // indirect
@@ -119,7 +119,7 @@ require (
 	go.yaml.in/yaml/v2 v2.4.3 // indirect
 	go.yaml.in/yaml/v3 v3.0.4 // indirect
 	golang.org/x/crypto v0.53.0 // indirect
-	golang.org/x/mod v0.36.0 // indirect
+	golang.org/x/mod v0.37.0 // indirect
 	golang.org/x/net v0.56.0
 	golang.org/x/oauth2 v0.36.0 // indirect
 	golang.org/x/sync v0.21.0 // indirect
