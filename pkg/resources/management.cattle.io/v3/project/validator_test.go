@@ -38,6 +38,14 @@ func TestConvertLimitToResourceList(t *testing.T) {
 			Services:               "11",
 			ServicesLoadBalancers:  "12",
 			ServicesNodePorts:      "13",
+			RequestsStorageClassStorage: map[string]string{
+				"local-path": "100Gi",
+				"ssd":        "200Gi",
+			},
+			RequestsStorageClassPVC: map[string]string{
+				"local-path": "10",
+				"ssd":        "20",
+			},
 			Extended: map[string]string{
 				"ephemeral-storage": "14",
 			},
@@ -58,6 +66,10 @@ func TestConvertLimitToResourceList(t *testing.T) {
 			"services":               resource.MustParse("11"),
 			"services.loadbalancers": resource.MustParse("12"),
 			"services.nodeports":     resource.MustParse("13"),
+			"local-path.storageclass.storage.k8s.io/requests.storage":       resource.MustParse("100Gi"),
+			"ssd.storageclass.storage.k8s.io/requests.storage":              resource.MustParse("200Gi"),
+			"local-path.storageclass.storage.k8s.io/persistentvolumeclaims": resource.MustParse("10"),
+			"ssd.storageclass.storage.k8s.io/persistentvolumeclaims":        resource.MustParse("20"),
 		}, out)
 	})
 }
