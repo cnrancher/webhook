@@ -1,10 +1,10 @@
 module github.com/rancher/webhook
 
-go 1.26.0
+go 1.26.10
 
 replace (
 	github.com/google/gnostic-models => github.com/google/gnostic-models v0.6.9
-	github.com/rancher/rancher/pkg/apis => github.com/cnrancher/pandaria/pkg/apis v0.0.0-20261012091159-5d0d841ca073
+	github.com/rancher/rancher/pkg/apis => github.com/cnrancher/pandaria/pkg/apis v0.0.0-20261103062023-b4f57e00d033
 	github.com/rancher/rke => github.com/rancher/rke v1.7.2
 	k8s.io/api => k8s.io/api v0.33.13
 	k8s.io/apiextensions-apiserver => k8s.io/apiextensions-apiserver v0.33.13
@@ -46,15 +46,15 @@ require (
 	github.com/rancher/dynamiclistener v0.7.7
 	github.com/rancher/jsonpath v0.0.0-20250620213443-ad24535cf0c1
 	github.com/rancher/lasso v0.2.5
-	github.com/rancher/rancher/pkg/apis v0.0.0-20260915174006-89e61f603ea6
+	github.com/rancher/rancher/pkg/apis v0.0.0-20261026231119-28ebaae6f5b2
 	github.com/rancher/rke v1.8.0
 	github.com/rancher/wrangler/v3 v3.3.5
 	github.com/robfig/cron v1.2.0
 	github.com/sirupsen/logrus v1.9.4
 	github.com/stretchr/testify v1.11.1
 	go.uber.org/mock v0.6.0
-	golang.org/x/text v0.41.0
-	golang.org/x/tools v0.49.0
+	golang.org/x/text v0.43.0
+	golang.org/x/tools v0.51.0
 	k8s.io/api v0.34.1
 	k8s.io/apimachinery v0.34.1
 	k8s.io/apiserver v0.34.1
@@ -101,23 +101,23 @@ require (
 	github.com/prometheus/client_model v0.6.1 // indirect
 	github.com/prometheus/common v0.62.0 // indirect
 	github.com/prometheus/procfs v0.15.1 // indirect
-	github.com/rancher/aks-operator v1.12.13 // indirect
-	github.com/rancher/eks-operator v1.12.13 // indirect
-	github.com/rancher/fleet/pkg/apis v0.13.16 // indirect
-	github.com/rancher/gke-operator v1.12.14 // indirect
+	github.com/rancher/aks-operator v1.12.14 // indirect
+	github.com/rancher/eks-operator v1.12.14 // indirect
+	github.com/rancher/fleet/pkg/apis v0.13.17 // indirect
+	github.com/rancher/gke-operator v1.12.15 // indirect
 	github.com/rancher/norman v0.6.1 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/x448/float16 v0.8.4 // indirect
 	go.opentelemetry.io/otel v1.44.0 // indirect
 	go.opentelemetry.io/otel/trace v1.44.0 // indirect
 	go.yaml.in/yaml/v2 v2.4.2 // indirect
-	golang.org/x/crypto v0.56.0 // indirect
-	golang.org/x/mod v0.40.0 // indirect
-	golang.org/x/net v0.58.0 // indirect
+	golang.org/x/crypto v0.58.0 // indirect
+	golang.org/x/mod v0.41.0 // indirect
+	golang.org/x/net v0.61.0 // indirect
 	golang.org/x/oauth2 v0.36.0 // indirect
-	golang.org/x/sync v0.22.0 // indirect
-	golang.org/x/sys v0.47.0 // indirect
-	golang.org/x/term v0.45.0 // indirect
+	golang.org/x/sync v0.24.0 // indirect
+	golang.org/x/sys v0.49.0 // indirect
+	golang.org/x/term v0.47.0 // indirect
 	golang.org/x/time v0.14.0 // indirect
 	golang.org/x/tools/go/expect v0.1.1-deprecated // indirect
 	gomodules.xyz/jsonpatch/v2 v2.5.0 // indirect
