@@ -151,6 +151,14 @@ The following labels are considered relevant for PSA enforcement:
 
 Validation ensures that the limits for cpu/memory must not be less than the requests for cpu/memory.
 
+#### Protected namespace deletion
+
+On the Rancher management (local) cluster, the `local` and `fleet-local` namespaces may not be deleted, as removing
+them corrupts the Rancher installation.
+
+This check is only registered when the webhook runs with multi-cluster management enabled. On downstream clusters
+namespaces with those names belong to the user and can be deleted normally.
+
 ## ResourceQuota
 
 ### Validation Checks
@@ -526,6 +534,21 @@ changed:
 
 In addition, as in the create validation, both a user subject and a group subject cannot be specified.
 
+## ProxyEndpoint
+
+### Validation Checks
+
+#### Overly Broad Wildcard Check
+
+Users may only create route entries within a ProxyEndpoint CR which
+
++ Are Absolute domains (`www.myapi.com`)
++ Are partial, inline, wildcards (`www.%.myapi.com`)
++ Are prefix wildcards (`*.myapi.com`, `*myapi.com`)
++ Do not include protocols (`https://`, etc.)
+
+Some of these checks are also done before a request is sent to the webhook, using kubebuilder Pattern comments on the CRD itself. Others, such as the overly broad wildcard check (e.g. `%.com`, `subdomain.%.com`), are done in the webhook as a regular expression would not be sufficient. In the event that the webhook is not running, the Rancher proxy also verifies that the route is not overly broad and silently ignores it if it is.  
+
 ## RoleTemplate
 
 ### Validation Checks
@@ -579,6 +602,8 @@ When settings are created or updated, the following common checks take place:
 - If set, `user-retention-cron` must be a valid standard cron expression (e.g. `0 0 * * 0`).
 - The `auth-user-session-ttl-minutes` must be a positive integer and can't be greater than `disable-inactive-user-after` or `delete-inactive-user-after` if those values are set.
 - The `auth-user-session-idle-ttl-minutes` must be a positive integer and can't be greater than `auth-user-session-ttl-minutes`.
+- If set, `crt-default-ttl-minutes` must be a valid integer no less than `30` and greater than `crt-default-grace-period-minutes` if that value is set.
+- If set, `crt-default-grace-period-minutes` must be a valid integer no less than `10` and less than `crt-default-ttl-minutes` if that value is set.
 
 #### Update
 
@@ -655,22 +680,6 @@ When a UserAttribute is updated, the following checks take place:
 - If set, `lastLogin` must be a valid date time according to RFC3339 (e.g. `2023-11-29T00:00:00Z`).
 - If set, `disableAfter` must be zero or a positive duration (e.g. `240h`).
 - If set, `deleteAfter` must be zero or a positive duration (e.g. `240h`).
-
-## ProxyEndpoint
-
-### Validation Checks
-
-#### On Create
-
-##### Domain Route Broadness
-
-Any domain included in a ProxyEndpoint Route entry must not be overly broad. If the domain includes an overly broad wildcard (e.g. `*.com`, `*.example.%.co.uk`, `%.co.uk`, etc.) it will be denied.
-
-#### On Update
-
-##### Domain Route Broadness
-
-Any domain included in a ProxyEndpoint Route entry must not be overly broad. If the domain includes an overly broad wildcard (e.g. `*.com`, `*.example.%.co.uk`, `%.co.uk`, etc.) it will be denied.
 
 # provisioning.cattle.io/v1
 
@@ -883,3 +892,35 @@ If `field.cattle.io/no-creator-rbac` annotation is set, `field.cattle.io/creator
 When a cluster is created `field.cattle.io/creatorId` is set to the Username from the request.
 
 If `field.cattle.io/no-creator-rbac` annotation is set, `field.cattle.io/creatorId` does not get set.
+
+# rke.cattle.io/v1
+
+## RKEControlPlane
+
+### Validation Checks
+
+#### On Create
+
+##### Data Directories
+
+Prevent the creation of new objects with an invalid data directory. An invalid data directory is defined as the
+following:
+- Is not an absolute path (i.e. does not start with `/`)
+- Attempts to include environment variables (e.g. `$VARIABLE` or `${VARIABLE}`)
+- Attempts to include shell expressions (e.g. `$(command)` or `` `command` ``)
+- Is not clean (e.g. contains `.` or `..`)
+- Equal to another data directory
+- Attempts to nest another data directory
+
+#### On Update
+
+##### Data Directories
+
+Prevent updating objects with an invalid data directory. An invalid data directory is defined as the
+following:
+- Is not an absolute path (i.e. does not start with `/`)
+- Attempts to include environment variables (e.g. `$VARIABLE` or `${VARIABLE}`)
+- Attempts to include shell expressions (e.g. `$(command)` or `` `command` ``)
+- Is not clean (e.g. contains `.` or `..`)
+- Equal to another data directory
+- Attempts to nest another data directory
